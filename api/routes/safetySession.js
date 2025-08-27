@@ -6,3 +6,5 @@ router.post("/", SafetySessionController.createSafetySession);
 router.patch("/:id/checkin", SafetySessionController.checkIn);
 
 module.exports = router;
+
+// testing github merge rules
