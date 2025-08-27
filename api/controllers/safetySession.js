@@ -21,6 +21,7 @@ async function createSafetySession(req, res) {
 
     res.status(201).json({
       message: "Safety session started successfully",
+      sessionId: savedSession._id,
       safetySession: savedSession,
     });
   } catch (err) {
