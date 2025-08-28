@@ -4,7 +4,7 @@ import { createSafetySession } from "../../src/services/safetySession";
 
 describe("createSafetySession", () => {
     const mock = new AxiosMockAdapter(axios);
-    const API_URL = "http://localhost:3000/safety-session";
+    const API_URL = "http://localhost:3000/safetySessions";
 
     afterEach(() => {
         mock.reset(); // Reset the mock after each test

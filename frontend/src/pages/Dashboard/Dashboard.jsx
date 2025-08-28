@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createSafetySession } from "../services/safetySessionService";
+import { createSafetySession } from "../../services/safetySession";
 
 
 export function Dashboard() {
@@ -21,27 +21,46 @@ export function Dashboard() {
     }
 
     const handleStartRun = async () => {
-        const numericDuration = durationToMinutes(selectedDuration); // Convert selected duration to numeric minutes
+        const numericDuration = durationToMinutes(selectedDuration);
+        
+        console.log('Starting run with duration:', numericDuration);
 
-        if (selectedDuration) {
-            console.log(`Run started for ${numericDuration} minutes!`);
-        } else {
+        if (!selectedDuration) {
             alert("Please select a duration before starting the run.");
             return;
         }
 
         try {
-        const userId = "64ff0e2ab123456789abcdef";
+            const userId = "64ff0e2ab123456789abcdef";
+            console.log('Calling createSafetySession with:', { userId, duration: numericDuration });
 
-        const data = await createSafetySession({ userId, duration: numericDuration });
-        const { sessionId } = data;
+            const data = await createSafetySession({ 
+                userId, 
+                duration: numericDuration 
+            });
 
-        console.log("Safety session started:", sessionId);
-        navigate("/active", { state: { sessionId, duration: numericDuration } });
-        console.log("Run started, sessionId:", sessionId);
-    } catch (err) {
-        console.error("Failed to start safety session:", err);
-    }
+            console.log('Received response:', data);
+            
+            if (!data || !data.sessionId) {
+                throw new Error('Invalid response - missing sessionId');
+            }
+
+            navigate("/active", { 
+                state: { 
+                    sessionId: data.sessionId, 
+                    duration: numericDuration 
+                } 
+            });
+            
+        } catch (err) {
+            console.error('Error details:', {
+                status: err.response?.status,
+                data: err.response?.data,
+                message: err.message
+            });
+            
+            alert(`Failed to start run: ${err.message}`);
+        }
     };
 
     const durations = ['30 minutes', '1 hour', '2 hours'];
