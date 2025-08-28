@@ -1,14 +1,22 @@
-import axios from "axios";
+import axios from 'axios';
 
-export async function createSafetySession(userId, duration) {
-    try {
-        const response = await axios.post("http://localhost:3000/safety-session", {
-            userId,
-            duration,
-        });
-        return response.data; // Return the entire response data
-    } catch (err) {
-        console.error("Failed to create safety session:", err);
-        throw err; // Re-throw the error for further handling if needed
-    }
-}   
+const API_BASE_URL = 'http://localhost:3000';
+
+export const createSafetySession = async ({ userId, duration }) => {
+  console.log('Making API request with:', { userId, duration });
+  
+  try {
+    const response = await axios.post(`${API_BASE_URL}/safetySessions`, {
+      userId,
+      duration,
+      startTime: new Date().toISOString()
+    });
+    
+    console.log('API Response:', response.data);
+    return response.data;
+    
+  } catch (error) {
+    console.error('API Error:', error.response?.data || error.message);
+    throw error;
+  }
+};
