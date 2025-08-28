@@ -15,8 +15,8 @@ app.use(bodyParser.json());
 
 // API Routes
 app.use("/users", usersRouter);
-app.use("/safety-session", safetySessionRouter);
-app.use("/emergency-contacts", emergencyContactsRouter);
+app.use("/safetySessions", safetySessionRouter);
+app.use("/emergencyContacts", emergencyContactsRouter);
 app.use("/tokens", authenticationRouter);
 
 // 404 Handler
