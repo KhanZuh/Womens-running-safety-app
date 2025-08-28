@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createSafetySession } from "../services/safetySessionService";
+import { createSafetySession } from "../../services/safetySession";
 
 
 export function Dashboard() {
