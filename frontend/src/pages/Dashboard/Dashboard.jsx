@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createSafetySession } from "../../services/safetySession";
+import logo from '../../assets/logo-light-grey.png';
 // //Testing the Modal: Delete after before pushing
 // import { SessionTimeoutModal } from "../../components/SessionTimeoutModal";    
 // //End 
@@ -82,32 +83,52 @@ export function Dashboard() {
 
     const durations = ['30 minutes', '1 hour', '2 hours'];
 
+
     return (
         <>
-            <h1>Dashboard</h1>
-            <p>Let someone know you're running - Just in case.</p>
+            <main className="flex flex-col justify-center items-center min-h-screen w-full text-center space-y-6">
+            {/* <h1>SafeRun</h1> */}
+            <img src={logo} alt="SafeRun logo" className="w-72 mx-auto" />
+
+            <h2 className = "font-bold">Let someone know you're running - just in case.</h2>
             <p>Enter your estimated run and we'll handle the rest.</p>
+
+            <div className="divider"></div>
+
             <p>How long will you run?</p>
 
-            <div>
-                {durations.map((duration) => (
-                    <button
-                        key={duration}
-                        onClick={() => {
-                            console.log(`Duration selected: ${duration}`);
-                            setSelectedDuration(duration);
-                        }}
-                    >
-                        {duration}
-                    </button>
-                ))}
+            <div className="flex flex-wrap justify-center gap-4">
+                {durations.map((duration) => {
+                    const isSelected = selectedDuration === duration;
+                    return (
+                        <button
+                            key={duration}
+                            onClick={() => {
+                                console.log(`Duration selected: ${duration}`);
+                                setSelectedDuration(duration);
+                            }}
+                            className={`btn btn-sm ${isSelected ? 'btn-accent' : 'btn-outline btn-accent'}`}
+                        >
+                            {duration}
+                        </button>
+                    );
+                })}
             </div>
 
-            <h3>Emergency Contact:</h3>
+            <button onClick={handleStartRun} className="btn btn-accent btn-sm btn-wide font-bold border-4">Start Run</button>
+
+            <div className="divider"></div>
+
+            <h2 className = "font-bold">Emergency Contact:</h2>
+            <div className="bg-primary bg-opacity-10 border border-primary p-4 rounded-lg shadow-md">
             <p>Name: Jane Doe</p>
             <p>Email: janedoe@example.com</p>
+            </div>
 
-            <button onClick={handleStartRun}>Start Run</button>
+            </main>
+        </>
+    );
+}
 
 
 {/* Testing the Modal: Delete after before pushing
@@ -118,8 +139,5 @@ export function Dashboard() {
         console.log("User confirmed they’re safe");
         setModalOpen(false);
     }}
-    //End */}
-{/* /> */}
-        </>
-    );
-}
+    //End
+/> */}
