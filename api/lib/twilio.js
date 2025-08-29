@@ -7,7 +7,7 @@ const client = new twilio(
 
 const twilio_number = process.env.TWILIO_PHONE_NUMBER;
 
-const emergencyNumber = '+19173528634';// hardcoded number - this will need to change
+const emergencyNumber = '+191735286340';// hardcoded number - this will need to change
 
 
 async function sendSMS(to, message) {
