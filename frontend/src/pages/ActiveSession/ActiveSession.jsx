@@ -180,7 +180,7 @@ export const ActiveSession = () => {
           We'll check in when time is up
         </p>
       </div>
-
+    
       {/* Radial Progress Timer */}
       <div className="mb-8">
         <div 
@@ -197,12 +197,12 @@ export const ActiveSession = () => {
           </span>
         </div>
       </div>
-
+      <div className="divider"></div>
       {/* Action Buttons */}
       <div className="flex flex-col gap-4 w-full max-w-sm">
         <button 
           onClick={handleEndSession}
-          className="btn btn-success btn-lg"
+          className="btn btn-accent btn-sm btn-wide font-bold border-4"
         >
           👌 I'm Safe Now - End Session
         </button>
