@@ -4,6 +4,12 @@ require("../mongodb_helper");
 const SafetySession = require("../../models/safetySession");
 const User = require("../../models/user");
 
+jest.mock('../../lib/twilio', () => ({
+  sendSessionStartNotifications: jest.fn().mockResolvedValue({
+    success: true
+  })
+}));
+
 describe("Safety Session Controller", () => {
   let testUserId;
 
@@ -37,7 +43,7 @@ describe("Safety Session Controller", () => {
 
       expect(response.status).toEqual(201);
       expect(response.body.message).toEqual(
-        "Safety session started successfully"
+        "Safety session started successfully, but notification failed"
       );
       expect(response.body.safetySession.userId).toEqual(testUserId.toString());
       expect(response.body.safetySession.duration).toEqual(60);
