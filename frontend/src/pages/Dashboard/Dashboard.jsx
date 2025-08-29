@@ -110,7 +110,7 @@ export function Dashboard() {
             <button onClick={handleStartRun}>Start Run</button>
 
 
-{/* Testing the Modal: Delete after before pushing */}
+{/* Testing the Modal: Delete after before pushing
             <SessionTimeoutModal
     isOpen={modalOpen}
     onClose={() => setModalOpen(false)}
@@ -118,8 +118,8 @@ export function Dashboard() {
         console.log("User confirmed they’re safe");
         setModalOpen(false);
     }}
-    //End
-/>
+    //End */}
+{/* /> */}
         </>
     );
 }
