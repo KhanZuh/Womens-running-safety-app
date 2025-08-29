@@ -2,12 +2,12 @@ const EmergencyContact = require("../models/emergencyContact");
 
 async function createEmergencyContact(req, res) {
   try {
-    const { userId, name, email } = req.body;
+    const { userId, name, phoneNumber } = req.body;
 
     const emergencyContact = new EmergencyContact({
       userId,
       name,
-      email,
+      phoneNumber,
     });
 
     const contact = await emergencyContact.save();
