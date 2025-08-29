@@ -33,7 +33,7 @@ describe("Emergency Contacts Controller", () => {
       const response = await testApp.post("/emergencycontacts").send({
         userId: testUserId,
         name: "John Doe",
-        email: "john.doe@example.com",
+        phoneNumber: "+447534330301",
       });
 
       expect(response.status).toEqual(201);
@@ -41,8 +41,8 @@ describe("Emergency Contacts Controller", () => {
         "Emergency contact created successfully"
       );
       expect(response.body.emergencyContact.name).toEqual("John Doe");
-      expect(response.body.emergencyContact.email).toEqual(
-        "john.doe@example.com"
+      expect(response.body.emergencyContact.phoneNumber).toEqual(
+        "+447534330301"
       );
       expect(response.body.emergencyContact.userId).toEqual(
         testUserId.toString()
@@ -54,13 +54,13 @@ describe("Emergency Contacts Controller", () => {
       await testApp.post("/emergencycontacts").send({
         userId: testUserId,
         name: "Jane Smith",
-        email: "jane.smith@example.com",
+        phoneNumber: "+447534330301",
       });
 
       const contacts = await EmergencyContact.find({ userId: testUserId });
       expect(contacts.length).toEqual(1);
       expect(contacts[0].name).toEqual("Jane Smith");
-      expect(contacts[0].email).toEqual("jane.smith@example.com");
+      expect(contacts[0].phoneNumber).toEqual("+447534330301");
     });
 
     test("responds with 400 when required fields are missing", async () => {
@@ -80,7 +80,7 @@ describe("Emergency Contacts Controller", () => {
       const testApp = supertest(app);
       const response = await testApp.post("/emergencycontacts").send({
         name: "John Doe",
-        email: "john.doe@example.com",
+        phoneNumber: "+447534330301",
         // missing userId
       });
 
