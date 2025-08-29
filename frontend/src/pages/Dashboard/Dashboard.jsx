@@ -2,28 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createSafetySession } from "../../services/safetySession";
 import logo from '../../assets/logo-light-grey.png';
-// //Testing the Modal: Delete after before pushing
-// import { SessionTimeoutModal } from "../../components/SessionTimeoutModal";    
-// //End 
+
+  
+
 export function Dashboard() {
-//     //Testing the Modal: Delete after before pushing
-//     const [modalOpen, setModalOpen] = useState(false);
-// //End 
+
+
     const [selectedDuration, setSelectedDuration] = useState(null); // Using state to manage selected duration
     const navigate = useNavigate();
-
-
-//     //Testing the Modal: Delete after before pushing
-//     useEffect(() => {
-//         const timer = setTimeout(() => {
-//             setModalOpen(true);
-//         }, 5000); // 5s for testing
-
-//         return () => clearTimeout(timer);
-//     }, []);
-// // End 
-
-
 
     function durationToMinutes(duration) { // Convert duration string to minutes
         if (!duration) return null;
@@ -127,14 +113,3 @@ export function Dashboard() {
     );
 }
 
-
-{/* Testing the Modal: Delete after before pushing
-            <SessionTimeoutModal
-    isOpen={modalOpen}
-    onClose={() => setModalOpen(false)}
-    onConfirm={() => {
-        console.log("User confirmed they’re safe");
-        setModalOpen(false);
-    }}
-    //End
-/> */}
