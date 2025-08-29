@@ -11,18 +11,22 @@ jest.mock('twilio', () => {
 });
 
 // Mock the entire twilio module with all its exports
+const mockSendSMS = jest.fn();
+const mockSendSessionStartNotifications = jest.fn();
+const mockSendSessionEndNotifications = jest.fn();
+const mockSendSessionExtensionNotifications = jest.fn();
+
 jest.mock('../../lib/twilio', () => {
-  const mockSendSMS = jest.fn();
-  const mockSendSessionStartNotifications = jest.fn();
-  
   return {
     sendSMS: mockSendSMS,
     sendSessionStartNotifications: mockSendSessionStartNotifications,
+    sendSessionEndNotifications: mockSendSessionEndNotifications,
+    sendSessionExtensionNotifications: mockSendSessionExtensionNotifications,
     twilio_number: '+1234567890'
   };
 });
 
-const { sendSMS, sendSessionStartNotifications } = require('../../lib/twilio');
+const { sendSMS, sendSessionStartNotifications, sendSessionEndNotifications, sendSessionExtensionNotifications} = require('../../lib/twilio');
 
 describe('Twilio Service', () => {
   const emergencyNumber = '+19173528634';
@@ -74,6 +78,35 @@ describe('Twilio Service', () => {
       const session = { duration: 45 };
       await sendSessionStartNotifications(null, session);
       expect(sendSessionStartNotifications).toHaveBeenCalledWith(null, session);
+    });
+  });
+
+
+  describe('sendSessionEndNotifications', () => {
+    test('should send session end notification successfully', async () => {
+      const mockResponse = { sid: 'SM1234567890', status: 'sent' };
+      mockSendSessionEndNotifications.mockResolvedValue(mockResponse);
+      
+      const actualEndTime = new Date();
+      actualEndTime.setHours(14, 56, 3);
+      const session = { actualEndTime };
+      const result = await sendSessionEndNotifications(null, session);
+      expect(mockSendSessionEndNotifications).toHaveBeenCalledWith(null, session);
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('sendSessionExtensionNotifications', () => {
+    test('should send session extension notification successfully', async () => {
+      const mockResponse = { sid: 'SM1234567890', status: 'sent' };
+      mockSendSessionExtensionNotifications.mockResolvedValue(mockResponse);
+      
+      const scheduledEndTime = new Date();
+      scheduledEndTime.setHours(14, 56, 3);
+      const session = { scheduledEndTime };
+      const result = await sendSessionExtensionNotifications(null, session);
+      expect(mockSendSessionExtensionNotifications).toHaveBeenCalledWith(null, session);
+      expect(result).toEqual(mockResponse);
     });
   });
 });
