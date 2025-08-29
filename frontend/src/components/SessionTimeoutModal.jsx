@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export function SessionTimeoutModal({ isOpen, onClose }) {
+export function SessionTimeoutModal({ isOpen, onClose, onConfirm }) {
     //tracks how much time is left on the countdown (starts at 10 for testing)
     const [timeLeft, setTimeLeft] = useState(10); // 10 seconds for testing
     //this becomes true when the timer hits 0 
@@ -53,6 +53,10 @@ export function SessionTimeoutModal({ isOpen, onClose }) {
     //Simply sets the flag to show a different message
     const handleConfirmSafe = () => {
         setIsConfirmedSafe(true);
+
+        if (onConfirm) { // this prop is needed so the parent component (activesession) knows the user confirmed they were safe (otherwise the safety session wouldn't actually end)
+            onConfirm();
+        }
 
     };
 

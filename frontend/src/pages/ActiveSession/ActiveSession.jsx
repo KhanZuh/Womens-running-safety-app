@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { SessionTimeoutModal } from '../../components/SessionTimeoutModal';
 
 export const ActiveSession = () => {
 
@@ -7,6 +8,8 @@ export const ActiveSession = () => {
   const [timeRemaining, setTimeRemaining] = useState(0);  // Milliseconds left in timer
   const [isLoading, setIsLoading] = useState(true);       // Loading state for UX
   const [error, setError] = useState(null);               // Error handling
+  const [showTimeoutModal, setShowTimeoutModal] = useState(false);
+
   
   // Navigation hooks 
   const { sessionId } = useParams();  // Gets sessionId from URL: /active/:sessionId
@@ -62,28 +65,30 @@ export const ActiveSession = () => {
 
   // TIMER LOGIC 
   useEffect(() => {
-    if (!session) return; // e.g. Don't start timer until there is session data available
+  if (!session) return;
 
-    // Set up interval to update every second
-    const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const endTime = new Date(session.scheduledEndTime).getTime();
-      const remaining = Math.max(0, endTime - now);
-      
-      setTimeRemaining(remaining);
-      
-      // Handle timer completion - for now just showing an alert - in future, this is where the modal showing the safety check in logic would be implemented.
-      if (remaining === 0) {
-        console.log('Timer completed! Time to check safety.');
-        alert('Your run time is up! Please confirm you are safe.');
-      }
-    }, 1000); // Update every 1000ms (1 second)
-
+  const timer = setInterval(() => {
+    const now = new Date().getTime();
+    const endTime = new Date(session.scheduledEndTime).getTime();
+    const remaining = Math.max(0, endTime - now);
     
+    setTimeRemaining(remaining);
+    
+    // Temp change for testing modal
+    // if (remaining === 0) { 
+    if (remaining <= (session.duration * 60 * 1000 - 10000)) { // Triggers after 10 seconds
+
+      console.log('Timer completed! Time to check safety.');
+      setShowTimeoutModal(true);
+      setTimeRemaining(0); // resetting the main timer state after modal appears - prevent any conflicts arising
+      clearInterval(timer); 
+    }
+  }, 1000);
+
     return () => {
       clearInterval(timer);  // Cleanup when component unmounts
     };
-  }, [session]); // Re-run when session changes
+  }, [session]);
 
 
   const handleEndSession = async () => {
@@ -114,8 +119,6 @@ export const ActiveSession = () => {
 
   const handleExtendTime = async () => {
     try {
-      // For now, we'll implement this as updating the session manually
-      // You'll need to add this endpoint to your backend
           const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/safetySessions/${sessionId}/extend`, {
         method: 'PATCH',
         headers: {
@@ -214,6 +217,18 @@ export const ActiveSession = () => {
           ⏰ Extend Time +15 mins
         </button>
       </div>
+      {/* Session time out Modal */}
+      <SessionTimeoutModal 
+        isOpen={showTimeoutModal}
+        onClose={() => {
+          setShowTimeoutModal(false);
+          navigate('/dashboard');
+        }}
+        onConfirm={() => {
+          handleEndSession(); // call check-in API when user confirms the are safe
+          setShowTimeoutModal(false);
+        }}
+      />
     </div>
   );
 };

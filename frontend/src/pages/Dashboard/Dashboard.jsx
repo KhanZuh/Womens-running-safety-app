@@ -2,28 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createSafetySession } from "../../services/safetySession";
 import logo from '../../assets/logo-light-grey.png';
-// //Testing the Modal: Delete after before pushing
-// import { SessionTimeoutModal } from "../../components/SessionTimeoutModal";    
-// //End 
+
+  
+
 export function Dashboard() {
-//     //Testing the Modal: Delete after before pushing
-//     const [modalOpen, setModalOpen] = useState(false);
-// //End 
+
+
     const [selectedDuration, setSelectedDuration] = useState(null); // Using state to manage selected duration
     const navigate = useNavigate();
-
-
-//     //Testing the Modal: Delete after before pushing
-//     useEffect(() => {
-//         const timer = setTimeout(() => {
-//             setModalOpen(true);
-//         }, 5000); // 5s for testing
-
-//         return () => clearTimeout(timer);
-//     }, []);
-// // End 
-
-
 
     function durationToMinutes(duration) { // Convert duration string to minutes
         if (!duration) return null;
@@ -56,25 +42,16 @@ export function Dashboard() {
                 userId, 
                 duration: numericDuration 
             });
-
+            // need to debug: console log the full response and convert the object to a string - helped to identify nested structure
+            // console.log('Full response structure:', JSON.stringify(data, null, 2)); 
             console.log('Received response:', data);
-            
-            if (!data || !data.sessionId) {
+        
+            // BUG FIX: Backend sending the session ID as _id inside a nested safetysession object - not as sessionId (this is a convention from MongoDB)
+            if (!data.safetySession._id) {
                 throw new Error('Invalid response - missing sessionId');
             }
 
-            // This does not connect the start button to the /active page
-            navigate("/active", {
-                state: { sessionId: data.sessionId, duration: numericDuration }
-            });
-
-            // The one below does
-
-            // To connect dashboard "Start" to active page
-            // navigate(`/active/${data.sessionId}`, {
-            //     state: { duration: numericDuration }
-            //     });
-
+            navigate(`/active/${data.safetySession._id}`);
             
         } catch (err) {
             console.error('Error details:', {
@@ -136,14 +113,3 @@ export function Dashboard() {
     );
 }
 
-
-{/* Testing the Modal: Delete after before pushing
-            <SessionTimeoutModal
-    isOpen={modalOpen}
-    onClose={() => setModalOpen(false)}
-    onConfirm={() => {
-        console.log("User confirmed they’re safe");
-        setModalOpen(false);
-    }}
-    //End
-/> */}
