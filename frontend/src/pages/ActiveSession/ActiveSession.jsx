@@ -114,8 +114,7 @@ export const ActiveSession = () => {
 
   const handleExtendTime = async () => {
     try {
-      // For now, we'll implement this as updating the session manually
-      // You'll need to add this endpoint to your backend
+      // For now, we'll implement this as updating the session manually - endpoint added to backend
           const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/safetySessions/${sessionId}/extend`, {
         method: 'PATCH',
         headers: {

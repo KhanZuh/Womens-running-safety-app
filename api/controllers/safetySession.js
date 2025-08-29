@@ -1,7 +1,6 @@
 const SafetySession = require("../models/safetySession");
 const User = require("../models/user");
-const {sendSessionStartNotifications } = require("../lib/twilio")
-
+const { sendSessionStartNotifications } = require("../lib/twilio");
 
 async function getSafetySession(req, res) {
   try {
@@ -43,25 +42,25 @@ async function createSafetySession(req, res) {
 
     let user;
     try {
-      user = await User.findById(userId).populate('emergencyContact');
-  
+      user = await User.findById(userId).populate("emergencyContact");
+
       const smsResult = await sendSessionStartNotifications(user, savedSession);
-  
+
       res.status(201).json({
         message: "Safety session started successfully",
         sessionId: savedSession._id,
         safetySession: savedSession,
-        smsSent: smsResult.success
+        smsSent: smsResult.success,
       });
-    }catch (smsError) {
-      console.error('SMS notification error: ', smsError)
+    } catch (smsError) {
+      console.error("SMS notification error: ", smsError);
 
       res.status(201).json({
         message: "Safety session started successfully, but notification failed",
         safetySession: savedSession,
-        notificationError: 'SMS notification failed',
+        notificationError: "SMS notification failed",
       });
-  }
+    }
   } catch (err) {
     console.error(err);
     res.status(400).json({ message: "Failed to create safety session" });
