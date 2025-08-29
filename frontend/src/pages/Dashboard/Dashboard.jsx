@@ -56,19 +56,16 @@ export function Dashboard() {
                 userId, 
                 duration: numericDuration 
             });
-
+            // need to debug: console log the full response and convert the object to a string - helped to identify nested structure
+            // console.log('Full response structure:', JSON.stringify(data, null, 2)); 
             console.log('Received response:', data);
-            
-            if (!data || !data.sessionId) {
+        
+            // BUG FIX: Backend sending the session ID as _id inside a nested safetysession object - not as sessionId (this is a convention from MongoDB)
+            if (!data.safetySession._id) {
                 throw new Error('Invalid response - missing sessionId');
             }
 
-            navigate("/active", { 
-                state: { 
-                    sessionId: data.sessionId, 
-                    duration: numericDuration 
-                } 
-            });
+            navigate(`/active/${data.safetySession._id}`);
             
         } catch (err) {
             console.error('Error details:', {
