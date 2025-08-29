@@ -27,7 +27,6 @@ async function createSafetySession(req, res) {
       user = await User.findById(userId).populate('emergencyContact');
   
       const smsResult = await sendSessionStartNotifications(user, savedSession);
-      console.log(`SMS notification result: ${smsResult.success ? 'Success' : 'Failed'}`)
   
       res.status(201).json({
         message: "Safety session started successfully",
