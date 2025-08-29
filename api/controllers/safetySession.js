@@ -58,6 +58,7 @@ async function createSafetySession(req, res) {
 
       res.status(201).json({
         message: "Safety session started successfully, but notification failed",
+        sessionId: savedSession._id, //bug fix - needed to include sessionId
         safetySession: savedSession,
         notificationError: 'SMS notification failed',
       });

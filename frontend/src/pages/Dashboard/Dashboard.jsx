@@ -63,12 +63,18 @@ export function Dashboard() {
                 throw new Error('Invalid response - missing sessionId');
             }
 
-            navigate("/active", { 
-                state: { 
-                    sessionId: data.sessionId, 
-                    duration: numericDuration 
-                } 
+            // This does not connect the start button to the /active page
+            navigate("/active", {
+                state: { sessionId: data.sessionId, duration: numericDuration }
             });
+
+            // The one below does
+
+            // To connect dashboard "Start" to active page
+            // navigate(`/active/${data.sessionId}`, {
+            //     state: { duration: numericDuration }
+            //     });
+
             
         } catch (err) {
             console.error('Error details:', {
