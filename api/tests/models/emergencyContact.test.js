@@ -26,19 +26,19 @@ describe("EmergencyContact model", () => {
     const contact = new EmergencyContact({
       userId: testUserId,
       name: "John Doe",
-      email: "john@example.com",
+      phoneNumber: "+447534330301",
     });
 
     expect(contact.userId).toEqual(testUserId);
     expect(contact.name).toEqual("John Doe");
-    expect(contact.email).toEqual("john@example.com");
+    expect(contact.phoneNumber).toEqual("+447534330301");
   });
 
   test("can save an emergency contact", async () => {
     const contact = new EmergencyContact({
       userId: testUserId,
       name: "Jane Smith",
-      email: "jane@example.com",
+      phoneNumber: "+447534330301",
     });
 
     await contact.save();
@@ -46,6 +46,6 @@ describe("EmergencyContact model", () => {
 
     expect(contacts.length).toEqual(1);
     expect(contacts[0].name).toEqual("Jane Smith");
-    expect(contacts[0].email).toEqual("jane@example.com");
+    expect(contacts[0].phoneNumber).toEqual("+447534330301");
   });
 });
