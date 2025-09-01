@@ -3,13 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { createSafetySession } from "../../services/safetySession";
 import logo from '../../assets/logo-light-grey.png';
 
-  
-
 export function Dashboard() {
-
 
     const [selectedDuration, setSelectedDuration] = useState(null); // Using state to manage selected duration
     const navigate = useNavigate();
+
 
     function durationToMinutes(duration) { // Convert duration string to minutes
         if (!duration) return null;
