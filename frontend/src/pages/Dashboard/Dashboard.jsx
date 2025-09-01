@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createSafetySession } from "../../services/safetySession";
 import logo from '../../assets/logo-light-grey.png';
 import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
 
 // // //Testing the Modal: Delete after before pushing
 // // import { SessionTimeoutModal } from "../../components/SessionTimeoutModal";    
@@ -122,6 +123,7 @@ export function Dashboard() {
             </div>
 
             </main>
+            <Footer />
         </>
     );
 }
