@@ -6,9 +6,9 @@ import { signup } from "../../services/authentication";
 export function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [preferredTimeOfDay, setPreferredTimeOfDay] = useState("");
+  const [preferredTimeOfDay, setPreferredTimeOfDay] = useState([]);
   const [numberOfRunsPerWeek, setNumberOfRunsPerWeek] = useState(0);
-  const [preferredTerrainTypes, setPreferredTerrainTypes] = useState("");
+  const [preferredTerrainTypes, setPreferredTerrainTypes] = useState([]);
 
   const navigate = useNavigate();
 
@@ -16,12 +16,12 @@ export function SignupPage() {
     event.preventDefault();
     try {
       await signup({
-        email, 
-        password, 
-        preferredTimeOfDay, 
-        numberOfRunsPerWeek, 
-        preferredTerrainTypes 
-    });
+        email,
+        password,
+        preferredTimeOfDay,
+        numberOfRunsPerWeek,
+        preferredTerrainTypes,
+      });
       navigate("/login");
     } catch (err) {
       console.error(err);
@@ -38,15 +38,33 @@ export function SignupPage() {
   }
 
   function handlePreferredTimeOfDayChange(event) {
-    setPreferredTimeOfDay(event.target.value);
+    const { value, checked } = event.target;
+
+    if (checked) {
+      // Add to array
+      setPreferredTimeOfDay((prev) => [...prev, value]);
+    } else {
+      // Remove from array
+      setPreferredTimeOfDay((prev) => prev.filter((type) => type != value))
+    }
+     
+
   }
-  
+
   function handleNumberOfRunsPerWeekChange(event) {
     setNumberOfRunsPerWeek(event.target.value);
   }
 
   function handlePreferredTerrainTypesChange(event) {
-    setPreferredTerrainTypes(event.target.value);
+    const { value, checked } = event.target;
+
+    if (checked) {
+      // Add to array
+      setPreferredTerrainTypes((prev) => [...prev, value]);
+    } else {
+      // Remove from array
+      setPreferredTerrainTypes((prev) => prev.filter((type) => type !== value));
+    }
   }
 
   return (
@@ -68,14 +86,45 @@ export function SignupPage() {
           value={password}
           onChange={handlePasswordChange}
         />
+        <fieldset>
+          <legend>Preferred Time Of Day to Run</legend>
+          <label>
+            <input
+              type="checkbox"
+              value="Morning"
+              checked={preferredTimeOfDay.includes("Morning")}
+              onChange={handlePreferredTimeOfDayChange}
 
-        <label htmlFor="preferredTimeOfDay">Preferred Time Of Day to Run:</label>
-        <input
-          id="preferredTimeOfDay"
-          type="text"
-          value={preferredTimeOfDay}
-          onChange={handlePreferredTimeOfDayChange}
-        />
+            />
+            Morning
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="Afternoon"
+              checked={preferredTimeOfDay.includes("Afternoon")}
+              onChange={handlePreferredTimeOfDayChange}
+
+            />
+            Afternoon
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="Evening"
+              checked={preferredTimeOfDay.includes("Evening")}
+              onChange={handlePreferredTimeOfDayChange}
+
+            />
+            Evening
+          </label>
+
+
+
+
+        </fieldset>
+
+
         <label htmlFor="numberOfRunsPerWeek">Number of Runs Per Week:</label>
         <input
           id="numberOfRunsPerWeek"
@@ -83,17 +132,40 @@ export function SignupPage() {
           value={numberOfRunsPerWeek}
           onChange={handleNumberOfRunsPerWeekChange}
         />
-        <label htmlFor="preferredTerrainTypes">Preferred Terrain Types:</label>
-        <select
-        id="preferredTerrainTypes"
-          type="text"
-          value={preferredTerrainTypes}
-          onChange={handlePreferredTerrainTypesChange}
-        >
-          <option value="Road">Road</option>
-          <option value="Trail">Trail</option>
-          <option value="Track">Track</option>
-        </select>
+        <fieldset>
+          <legend>Preferred Terrain Types:</legend>
+
+          <label>
+            <input
+              type="checkbox"
+              value="Road"
+              checked={preferredTerrainTypes.includes("Road")}
+              onChange={handlePreferredTerrainTypesChange}
+            />
+            Road
+          </label>
+
+          <label>
+            <input
+              type="checkbox"
+              value="Trail"
+              checked={preferredTerrainTypes.includes("Trail")}
+              onChange={handlePreferredTerrainTypesChange}
+            />
+            Trail
+          </label>
+
+          <label>
+            <input
+              type="checkbox"
+              value="Track"
+              checked={preferredTerrainTypes.includes("Track")}
+              onChange={handlePreferredTerrainTypesChange}
+            />
+            Track
+          </label>
+        </fieldset>
+
         <input role="submit-button" id="submit" type="submit" value="Submit" />
       </form>
     </>

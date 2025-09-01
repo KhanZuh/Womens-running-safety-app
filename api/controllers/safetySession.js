@@ -1,7 +1,12 @@
 const SafetySession = require("../models/safetySession");
 const User = require("../models/user");
 
-const {sendSessionStartNotifications, sendSessionEndNotifications, sendSessionExtensionNotifications, sendSessionOverdueNotifications } = require("../lib/twilio")
+const {
+  sendSessionStartNotifications,
+  sendSessionEndNotifications,
+  sendSessionExtensionNotifications,
+  sendSessionOverdueNotifications,
+} = require("../lib/twilio");
 
 async function getSafetySession(req, res) {
   try {
@@ -51,7 +56,7 @@ async function createSafetySession(req, res) {
         message: "Safety session started successfully",
         sessionId: savedSession._id,
         safetySession: savedSession,
-        smsSent: smsResult
+        smsSent: smsResult,
       });
     } catch (smsError) {
       console.error("SMS notification error: ", smsError);
@@ -72,7 +77,7 @@ async function createSafetySession(req, res) {
 async function checkIn(req, res) {
   try {
     const sessionId = req.params.id;
-    const {userId} = req.body;
+    const { userId } = req.body;
 
     const session = await SafetySession.findByIdAndUpdate(
       sessionId,
@@ -86,23 +91,22 @@ async function checkIn(req, res) {
 
     let user;
     try {
-      user = await User.findById(userId).populate('emergencyContact');
-      const smsResult = await sendSessionEndNotifications(user, session)
+      user = await User.findById(userId).populate("emergencyContact");
+      const smsResult = await sendSessionEndNotifications(user, session);
 
       res.status(200).json({
         message: "Check-in successful! You're safe.",
         safetySession: session,
-        smsSent: smsResult
-    });
+        smsSent: smsResult,
+      });
     } catch (smsError) {
-      console.error('SMS notification error: ', smsError)
+      console.error("SMS notification error: ", smsError);
       res.status(200).json({
         message: "Check-in successful! You're safe.",
         safetySession: session,
-        notificationError: "SMS notification failed"
+        notificationError: "SMS notification failed",
       });
     }
-
   } catch (err) {
     console.error(err);
     res.status(400).json({ message: "Failed to check in" });
@@ -113,7 +117,7 @@ async function extendSession(req, res) {
   try {
     const sessionId = req.params.id;
     const { additionalMinutes = 15 } = req.body;
-    const {userId} = req.body;
+    const { userId } = req.body;
 
     const session = await SafetySession.findById(sessionId);
 
@@ -133,23 +137,21 @@ async function extendSession(req, res) {
     );
     let user;
     try {
-      user = await User.findById(userId).populate('emergencyContact');
-      const smsResult = await sendSessionExtensionNotifications(user, session)
+      user = await User.findById(userId).populate("emergencyContact");
+      const smsResult = await sendSessionExtensionNotifications(user, session);
       res.status(200).json({
         message: `Session extended by ${additionalMinutes} minutes`,
         safetySession: updatedSession,
-        smsSent: smsResult
-    });
+        smsSent: smsResult,
+      });
     } catch (smsError) {
-      console.error('SMS notification error: ', smsError)
+      console.error("SMS notification error: ", smsError);
       res.status(200).json({
-        message: `Session extended by ${additionalMinutes} minutes`, 
+        message: `Session extended by ${additionalMinutes} minutes`,
         safetySession: updatedSession,
-        smsSent: smsResult
-      })
+        smsSent: smsResult,
+      });
     }
-
-    
   } catch (err) {
     console.error(err);
     res.status(400).json({ message: "Failed to extend session" });
