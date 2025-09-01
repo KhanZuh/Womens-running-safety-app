@@ -2,6 +2,18 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createSafetySession } from "../../services/safetySession";
 import logo from '../../assets/logo-light-grey.png';
+import Navbar from '../../components/Navbar';
+
+// // //Testing the Modal: Delete after before pushing
+// // import { SessionTimeoutModal } from "../../components/SessionTimeoutModal";    
+// // //End 
+// export function Dashboard() {
+// //     //Testing the Modal: Delete after before pushing
+// //     const [modalOpen, setModalOpen] = useState(false);
+// // //End 
+//     const [selectedDuration, setSelectedDuration] = useState(null); // Using state to manage selected duration
+//     const navigate = useNavigate();
+
 
   
 
@@ -69,6 +81,7 @@ export function Dashboard() {
 
     return (
         <>
+            <Navbar />
             <main className="flex flex-col justify-center items-center min-h-screen w-full text-center space-y-6">
             {/* <h1>SafeRun</h1> */}
             <img src={logo} alt="SafeRun logo" className="w-72 mx-auto" />
