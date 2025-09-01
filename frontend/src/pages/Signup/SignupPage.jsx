@@ -20,6 +20,7 @@ export function SignupPage() {
       await signup({
         email,
         password,
+        fullname,
         preferredTimeOfDay,
         numberOfRunsPerWeek,
         preferredTerrainTypes,
@@ -148,7 +149,7 @@ export function SignupPage() {
               onChange={handleNumberOfRunsPerWeekChange}
               className="input input-bordered mt-2"
               placeholder="e.g. 3"
-              required
+
             />
           </label>
 

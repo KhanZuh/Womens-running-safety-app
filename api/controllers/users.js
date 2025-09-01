@@ -1,13 +1,14 @@
 const User = require("../models/user");
 
 function create(req, res) {
+  const fullname = req.body.fullname;
   const email = req.body.email;
   const password = req.body.password;
   const preferredTimeOfDay = req.body.preferredTimeOfDay;
   const numberOfRunsPerWeek = req.body.numberOfRunsPerWeek;
   const preferredTerrainTypes = req.body.preferredTerrainTypes;
 
-  const user = new User({ email, password, preferredTimeOfDay, numberOfRunsPerWeek, preferredTerrainTypes });
+  const user = new User({ fullname, email, password, preferredTimeOfDay, numberOfRunsPerWeek, preferredTerrainTypes });
   user
     .save()
     .then((user) => {
