@@ -12,6 +12,9 @@ export function SignupPage() {
   const [preferredTerrainTypes, setPreferredTerrainTypes] = useState([]);
   const [fullname, setFullname] = useState("");
   const [error, setError] = useState("");
+  const [emergencyName, setEmergencyName] = useState("");
+  const [emergencyPhone, setEmergencyPhone] = useState("");
+  const [emergencyRelationship, setEmergencyRelationship] = useState("");
 
   const navigate = useNavigate();
 
@@ -30,6 +33,11 @@ export function SignupPage() {
         preferredTimeOfDay,
         numberOfRunsPerWeek,
         preferredTerrainTypes,
+        emergencyContact: {
+          name: emergencyName,
+          phoneNumber: emergencyPhone,
+          relationship: emergencyRelationship,
+        }
       });
       navigate("/login");
     } catch (err) {
@@ -183,6 +191,38 @@ export function SignupPage() {
               </label>
             ))}
           </fieldset>
+          <label className="flex flex-col">
+            Emergency Contact Name:
+            <input
+              type="text"
+              className="input input-bordered mt-2"
+              value={emergencyName}
+              onChange={(e) => setEmergencyName(e.target.value)}
+              required
+            />
+          </label>
+
+          <label className="flex flex-col">
+            Emergency Contact Phone:
+            <input
+              type="tel"
+              className="input input-bordered mt-2"
+              value={emergencyPhone}
+              onChange={(e) => setEmergencyPhone(e.target.value)}
+              required
+            />
+          </label>
+
+          <label className="flex flex-col">
+            Emergency Contact Relationship:
+            <input
+              type="text"
+              className="input input-bordered mt-2"
+              value={emergencyRelationship}
+              onChange={(e) => setEmergencyRelationship(e.target.value)}
+              required
+            />
+          </label>
 
           <button
             type="submit"
