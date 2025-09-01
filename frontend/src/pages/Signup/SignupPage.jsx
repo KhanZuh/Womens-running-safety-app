@@ -11,11 +11,17 @@ export function SignupPage() {
   const [numberOfRunsPerWeek, setNumberOfRunsPerWeek] = useState(0);
   const [preferredTerrainTypes, setPreferredTerrainTypes] = useState([]);
   const [fullname, setFullname] = useState("");
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
   async function handleSubmit(event) {
     event.preventDefault();
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+    setError(""); // clear any previous error
     try {
       await signup({
         email,
@@ -27,8 +33,8 @@ export function SignupPage() {
       });
       navigate("/login");
     } catch (err) {
-      console.error(err);
-      navigate("/signup");
+      const errorMsg = err.message || "Signup failed";
+      setError(errorMsg);
     }
   }
 
@@ -77,6 +83,11 @@ export function SignupPage() {
       <img src={logo} alt="SafeRun logo" className="w-72 mx-auto" />
       <h2 className="text-3xl font-bold mb-6 text-center">Sign Up</h2>
 
+      {error && (
+        <div className="text-red-500 text-center font-semibold mb-4">
+          {error}
+        </div>
+      )}
       <div className="max-w-md mx-auto p-8 bg-base-200 rounded-lg shadow-lg">
         <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
           <label className="flex flex-col">
@@ -149,7 +160,6 @@ export function SignupPage() {
               onChange={handleNumberOfRunsPerWeekChange}
               className="input input-bordered mt-2"
               placeholder="e.g. 3"
-
             />
           </label>
 

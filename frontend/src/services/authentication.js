@@ -43,23 +43,16 @@ export async function login(email, password) {
 //   };
 
 export async function signup(userData) {
-  const requestOptions = {
+  const response = await fetch(`${BACKEND_URL}/users`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(userData),
-  };
+  });
 
-
-  let response = await fetch(`${BACKEND_URL}/users`, requestOptions);
-
-  // docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201
   if (response.status === 201) {
     return;
   } else {
-    throw new Error(
-      `Received status ${response.status} when signing up. Expected 201`
-    );
+    const errorData = await response.json();  // 👈 THIS is key
+    throw new Error(errorData.message || `Received status ${response.status}`);
   }
 }
