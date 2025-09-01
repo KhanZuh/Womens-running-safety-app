@@ -28,19 +28,29 @@ export async function login(email, password) {
   }
 }
 
-export async function signup(email, password) {
-  const payload = {
-    email: email,
-    password: password,
-  };
+// export async function signup(email, password) {
+//   const payload = {
+//     email: email,
+//     password: password,
+//   };
 
+//   const requestOptions = {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(payload),
+//   };
+
+export async function signup(userData) {
   const requestOptions = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(userData),
   };
+
 
   let response = await fetch(`${BACKEND_URL}/users`, requestOptions);
 

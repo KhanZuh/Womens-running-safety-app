@@ -15,7 +15,13 @@ export function SignupPage() {
   async function handleSubmit(event) {
     event.preventDefault();
     try {
-      await signup(email, password);
+      await signup({
+        email, 
+        password, 
+        preferredTimeOfDay, 
+        numberOfRunsPerWeek, 
+        preferredTerrainTypes 
+    });
       navigate("/login");
     } catch (err) {
       console.error(err);
@@ -88,10 +94,6 @@ export function SignupPage() {
           <option value="Trail">Trail</option>
           <option value="Track">Track</option>
         </select>
-          
-          
-        
-
         <input role="submit-button" id="submit" type="submit" value="Submit" />
       </form>
     </>
