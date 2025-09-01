@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { signup } from "../../services/authentication";
+import logo from "../../assets/logo-light-grey.png";
 
 export function SignupPage() {
   const [email, setEmail] = useState("");
@@ -70,9 +71,11 @@ export function SignupPage() {
     }
   }
 
-return (
+  return (
     <>
-      <h2 className="text-3xl font-bold mb-6 text-center">Signup</h2>
+      <img src={logo} alt="SafeRun logo" className="w-72 mx-auto" />
+      <h2 className="text-3xl font-bold mb-6 text-center">Sign Up</h2>
+
       <div className="max-w-md mx-auto p-8 bg-base-200 rounded-lg shadow-lg">
         <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
           <label className="flex flex-col">
@@ -94,7 +97,7 @@ return (
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
               className="input input-bordered mt-2"
               placeholder="you@example.com"
               required
@@ -107,7 +110,7 @@ return (
               id="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
               className="input input-bordered mt-2"
               placeholder="********"
               required
@@ -115,21 +118,19 @@ return (
           </label>
 
           <fieldset className="flex flex-col space-y-3">
-            <legend className="font-semibold text-lg">Preferred Time Of Day to Run</legend>
+            <legend className="font-semibold text-lg">
+              Preferred Time Of Day to Run
+            </legend>
             {["Morning", "Afternoon", "Evening"].map((time) => (
-              <label key={time} className="cursor-pointer flex items-center space-x-3">
+              <label
+                key={time}
+                className="cursor-pointer flex items-center space-x-3"
+              >
                 <input
                   type="checkbox"
                   value={time}
                   checked={preferredTimeOfDay.includes(time)}
-                  onChange={(e) => {
-                    const { value, checked } = e.target;
-                    if (checked) {
-                      setPreferredTimeOfDay((prev) => [...prev, value]);
-                    } else {
-                      setPreferredTimeOfDay((prev) => prev.filter((t) => t !== value));
-                    }
-                  }}
+                  onChange={handlePreferredTimeOfDayChange}
                   className="checkbox checkbox-accent"
                 />
                 <span>{time}</span>
@@ -144,7 +145,7 @@ return (
               type="number"
               min={0}
               value={numberOfRunsPerWeek}
-              onChange={(e) => setNumberOfRunsPerWeek(Number(e.target.value))}
+              onChange={handleNumberOfRunsPerWeekChange}
               className="input input-bordered mt-2"
               placeholder="e.g. 3"
               required
@@ -152,21 +153,19 @@ return (
           </label>
 
           <fieldset className="flex flex-col space-y-3">
-            <legend className="font-semibold text-lg">Preferred Terrain Types</legend>
+            <legend className="font-semibold text-lg">
+              Preferred Terrain Types
+            </legend>
             {["Road", "Trail", "Track"].map((terrain) => (
-              <label key={terrain} className="cursor-pointer flex items-center space-x-3">
+              <label
+                key={terrain}
+                className="cursor-pointer flex items-center space-x-3"
+              >
                 <input
                   type="checkbox"
                   value={terrain}
                   checked={preferredTerrainTypes.includes(terrain)}
-                  onChange={(e) => {
-                    const { value, checked } = e.target;
-                    if (checked) {
-                      setPreferredTerrainTypes((prev) => [...prev, value]);
-                    } else {
-                      setPreferredTerrainTypes((prev) => prev.filter((t) => t !== value));
-                    }
-                  }}
+                  onChange={handlePreferredTerrainTypesChange}
                   className="checkbox checkbox-accent"
                 />
                 <span>{terrain}</span>
@@ -174,10 +173,23 @@ return (
             ))}
           </fieldset>
 
-          <button type="submit" className="btn btn-accent btn-wide font-bold border-4">
+          <button
+            type="submit"
+            className="btn btn-accent btn-wide font-bold border-4"
+          >
             Submit
           </button>
         </form>
+
+        <p className="mt-6 text-center">
+          Already have an account?{" "}
+          <a
+            href="/login"
+            className="text-accent hover:underline font-semibold"
+          >
+            Login here
+          </a>
+        </p>
       </div>
     </>
   );
