@@ -30,24 +30,40 @@ export function LoginPage() {
 
   return (
     <>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="email">Email:</label>
-        <input
-          id="email"
-          type="text"
-          value={email}
-          onChange={handleEmailChange}
-        />
-        <label htmlFor="password">Password:</label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={handlePasswordChange}
-        />
-        <input role="submit-button" id="submit" type="submit" value="Submit" />
-      </form>
+      <h2 className="text-3xl font-bold mb-6 text-center">Login</h2>
+      <div className="max-w-md mx-auto p-8 bg-base-200 rounded-lg shadow-lg">
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
+          <label className="flex flex-col">
+            Email:
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input input-bordered mt-2"
+              placeholder="you@example.com"
+              required
+            />
+          </label>
+
+          <label className="flex flex-col">
+            Password:
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input input-bordered mt-2"
+              placeholder="********"
+              required
+            />
+          </label>
+
+          <button type="submit" className="btn btn-accent btn-wide font-bold border-4">
+            Submit
+          </button>
+        </form>
+      </div>
     </>
   );
 }

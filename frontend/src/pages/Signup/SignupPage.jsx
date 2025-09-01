@@ -9,6 +9,7 @@ export function SignupPage() {
   const [preferredTimeOfDay, setPreferredTimeOfDay] = useState([]);
   const [numberOfRunsPerWeek, setNumberOfRunsPerWeek] = useState(0);
   const [preferredTerrainTypes, setPreferredTerrainTypes] = useState([]);
+  const [fullname, setFullname] = useState("");
 
   const navigate = useNavigate();
 
@@ -29,6 +30,10 @@ export function SignupPage() {
     }
   }
 
+  function handleFullnameChange(event) {
+    setFullname(event.target.value);
+  }
+
   function handleEmailChange(event) {
     setEmail(event.target.value);
   }
@@ -45,10 +50,8 @@ export function SignupPage() {
       setPreferredTimeOfDay((prev) => [...prev, value]);
     } else {
       // Remove from array
-      setPreferredTimeOfDay((prev) => prev.filter((type) => type != value))
+      setPreferredTimeOfDay((prev) => prev.filter((type) => type != value));
     }
-     
-
   }
 
   function handleNumberOfRunsPerWeekChange(event) {
@@ -67,107 +70,115 @@ export function SignupPage() {
     }
   }
 
-  return (
+return (
     <>
-      <h2>Signup</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="email">Email:</label>
-        <input
-          id="email"
-          type="text"
-          value={email}
-          onChange={handleEmailChange}
-        />
-        <label htmlFor="password">Password:</label>
-        <input
-          placeholder="Password"
-          id="password"
-          type="password"
-          value={password}
-          onChange={handlePasswordChange}
-        />
-        <fieldset>
-          <legend>Preferred Time Of Day to Run</legend>
-          <label>
+      <h2 className="text-3xl font-bold mb-6 text-center">Signup</h2>
+      <div className="max-w-md mx-auto p-8 bg-base-200 rounded-lg shadow-lg">
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
+          <label className="flex flex-col">
+            Full Name:
             <input
-              type="checkbox"
-              value="Morning"
-              checked={preferredTimeOfDay.includes("Morning")}
-              onChange={handlePreferredTimeOfDayChange}
-
+              id="fullname"
+              type="text"
+              value={fullname}
+              onChange={handleFullnameChange}
+              className="input input-bordered mt-2"
+              placeholder="Your Full name"
+              required
             />
-            Morning
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              value="Afternoon"
-              checked={preferredTimeOfDay.includes("Afternoon")}
-              onChange={handlePreferredTimeOfDayChange}
-
-            />
-            Afternoon
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              value="Evening"
-              checked={preferredTimeOfDay.includes("Evening")}
-              onChange={handlePreferredTimeOfDayChange}
-
-            />
-            Evening
           </label>
 
-
-
-
-        </fieldset>
-
-
-        <label htmlFor="numberOfRunsPerWeek">Number of Runs Per Week:</label>
-        <input
-          id="numberOfRunsPerWeek"
-          type="number"
-          value={numberOfRunsPerWeek}
-          onChange={handleNumberOfRunsPerWeekChange}
-        />
-        <fieldset>
-          <legend>Preferred Terrain Types:</legend>
-
-          <label>
+          <label className="flex flex-col">
+            Email:
             <input
-              type="checkbox"
-              value="Road"
-              checked={preferredTerrainTypes.includes("Road")}
-              onChange={handlePreferredTerrainTypesChange}
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input input-bordered mt-2"
+              placeholder="you@example.com"
+              required
             />
-            Road
           </label>
 
-          <label>
+          <label className="flex flex-col">
+            Password:
             <input
-              type="checkbox"
-              value="Trail"
-              checked={preferredTerrainTypes.includes("Trail")}
-              onChange={handlePreferredTerrainTypesChange}
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input input-bordered mt-2"
+              placeholder="********"
+              required
             />
-            Trail
           </label>
 
-          <label>
-            <input
-              type="checkbox"
-              value="Track"
-              checked={preferredTerrainTypes.includes("Track")}
-              onChange={handlePreferredTerrainTypesChange}
-            />
-            Track
-          </label>
-        </fieldset>
+          <fieldset className="flex flex-col space-y-3">
+            <legend className="font-semibold text-lg">Preferred Time Of Day to Run</legend>
+            {["Morning", "Afternoon", "Evening"].map((time) => (
+              <label key={time} className="cursor-pointer flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  value={time}
+                  checked={preferredTimeOfDay.includes(time)}
+                  onChange={(e) => {
+                    const { value, checked } = e.target;
+                    if (checked) {
+                      setPreferredTimeOfDay((prev) => [...prev, value]);
+                    } else {
+                      setPreferredTimeOfDay((prev) => prev.filter((t) => t !== value));
+                    }
+                  }}
+                  className="checkbox checkbox-accent"
+                />
+                <span>{time}</span>
+              </label>
+            ))}
+          </fieldset>
 
-        <input role="submit-button" id="submit" type="submit" value="Submit" />
-      </form>
+          <label className="flex flex-col">
+            Number of Runs Per Week:
+            <input
+              id="numberOfRunsPerWeek"
+              type="number"
+              min={0}
+              value={numberOfRunsPerWeek}
+              onChange={(e) => setNumberOfRunsPerWeek(Number(e.target.value))}
+              className="input input-bordered mt-2"
+              placeholder="e.g. 3"
+              required
+            />
+          </label>
+
+          <fieldset className="flex flex-col space-y-3">
+            <legend className="font-semibold text-lg">Preferred Terrain Types</legend>
+            {["Road", "Trail", "Track"].map((terrain) => (
+              <label key={terrain} className="cursor-pointer flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  value={terrain}
+                  checked={preferredTerrainTypes.includes(terrain)}
+                  onChange={(e) => {
+                    const { value, checked } = e.target;
+                    if (checked) {
+                      setPreferredTerrainTypes((prev) => [...prev, value]);
+                    } else {
+                      setPreferredTerrainTypes((prev) => prev.filter((t) => t !== value));
+                    }
+                  }}
+                  className="checkbox checkbox-accent"
+                />
+                <span>{terrain}</span>
+              </label>
+            ))}
+          </fieldset>
+
+          <button type="submit" className="btn btn-accent btn-wide font-bold border-4">
+            Submit
+          </button>
+        </form>
+      </div>
     </>
   );
 }
