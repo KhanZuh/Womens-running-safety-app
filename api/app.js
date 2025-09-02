@@ -5,6 +5,7 @@ const cors = require("cors");
 const usersRouter = require("./routes/users");
 const safetySessionRouter = require("./routes/safetySession");
 const emergencyContactsRouter = require("./routes/emergencyContacts");
+const quotesRouter = require("./routes/quotes");
 const authenticationRouter = require("./routes/authentication");
 const tokenChecker = require("./middleware/tokenChecker");
 
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 app.use("/users", usersRouter);
 app.use("/safetySessions", safetySessionRouter);
 app.use("/emergencyContacts", emergencyContactsRouter);
+app.use("/quotes", quotesRouter);
 app.use("/tokens", authenticationRouter);
 
 // 404 Handler
