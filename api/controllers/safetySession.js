@@ -1,7 +1,8 @@
 const SafetySession = require("../models/safetySession");
 const User = require("../models/user");
 
-const {sendSessionStartNotifications, sendSessionEndNotifications, sendSessionExtensionNotifications, sendSessionOverdueNotifications } = require("../lib/twilio")
+const {sendSessionStartNotifications, sendSessionEndNotifications, sendSessionExtensionNotifications, sendSessionOverdueNotifications } = require("../lib/twilio");
+const EmergencyContact = require("../models/emergencyContact");
 
 async function getSafetySession(req, res) {
   try {
@@ -43,7 +44,7 @@ async function createSafetySession(req, res) {
 
     let user;
     try {
-      user = await User.findById(userId).populate("emergencyContact");
+      user = await User.findById(userId);
 
       const smsResult = await sendSessionStartNotifications(user, savedSession);
 
@@ -86,7 +87,7 @@ async function checkIn(req, res) {
 
     let user;
     try {
-      user = await User.findById(userId).populate('emergencyContact');
+      user = await User.findById(userId);
       const smsResult = await sendSessionEndNotifications(user, session)
 
       res.status(200).json({
@@ -133,7 +134,7 @@ async function extendSession(req, res) {
     );
     let user;
     try {
-      user = await User.findById(userId).populate('emergencyContact');
+      user = await User.findById(userId);
       const smsResult = await sendSessionExtensionNotifications(user, session)
       res.status(200).json({
         message: `Session extended by ${additionalMinutes} minutes`,
@@ -156,11 +157,39 @@ async function extendSession(req, res) {
   }
 }
 
+
+async function overDueSession() {
+  try {
+    const current_date = new Date();
+    const fiveMinuteAgo = new Date(current_date.getTime() - (1 * 60 * 1000)); // to be changed to 5 minutes, it's 1minute at the moment
+
+    const overdueSessions = await SafetySession.find({
+      scheduledEndTime: { $lt: fiveMinuteAgo }, // before five minutes
+      actualEndTime: null, 
+      overdueNotificationSent: { $ne: true } // not true
+    });
+
+    for (const session of overdueSessions) {
+      try {
+        const user = await User.findById(session.userId);
+        await sendSessionOverdueNotifications(user, session);
+        await SafetySession.findByIdAndUpdate(session._id, { overdueNotificationSent: true });
+      } catch (error) {
+        console.error(`Failed to send alert for session ${session._id}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error('Error in checkAllOverDueSession:', error);
+  }
+}
+
+
 const SafetySessionController = {
   createSafetySession,
   checkIn,
   getSafetySession,
   extendSession,
+  overDueSession
 };
 
 module.exports = SafetySessionController;
