@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "jest --forceExit"
+    "test": "jest",
+    "seed": "node seeds/seed.js"
+    "test:force": "jest --forceExit"
   },
   "author": "Makers Academy",
   "license": "CC-BY-NC-SA-4.0",

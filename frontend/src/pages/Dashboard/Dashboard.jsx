@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createSafetySession } from "../../services/safetySession";
 import logo from '../../assets/logo-light-grey.png';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import Quote from '../../components/Quote'
 
 // // //Testing the Modal: Delete after before pushing
 // // import { SessionTimeoutModal } from "../../components/SessionTimeoutModal";    
@@ -85,8 +86,8 @@ export function Dashboard() {
             {/* <h1>SafeRun</h1> */}
             <img src={logo} alt="SafeRun logo" className="w-72 mx-auto" />
 
-            <h2 className = "font-bold">Let someone know you're running - just in case.</h2>
-            <p>Enter your estimated run and we'll handle the rest.</p>
+            <h2 className = "font-bold">Let someone know you&apos;re running - just in case.</h2>
+            <p>Enter your estimated run and we&apos;ll handle the rest.</p>
 
             <div className="divider"></div>
 
@@ -111,6 +112,10 @@ export function Dashboard() {
             </div>
 
             <button onClick={handleStartRun} className="btn btn-accent btn-sm btn-wide font-bold border-4">Start Run</button>
+
+            <div className="divider"></div>
+
+            <Quote />
 
             <div className="divider"></div>
 
