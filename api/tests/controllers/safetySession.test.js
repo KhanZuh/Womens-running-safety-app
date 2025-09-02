@@ -3,9 +3,17 @@ const supertest = require("supertest");
 require("../mongodb_helper");
 const SafetySession = require("../../models/safetySession");
 const User = require("../../models/user");
+const { overDueSession } = require("../../controllers/safetySession");
+const { sendSessionOverdueNotifications } = require("../../lib/twilio");
 
 jest.mock('../../lib/twilio', () => ({
   sendSessionStartNotifications: jest.fn().mockResolvedValue({
+    success: true
+  }),
+  sendSessionOverdueNotifications: jest.fn().mockResolvedValue({
+    success: true
+  }),
+  sendSessionEndNotifications: jest.fn().mockResolvedValue({
     success: true
   })
 }));
@@ -43,7 +51,7 @@ describe("Safety Session Controller", () => {
 
       expect(response.status).toEqual(201);
       expect(response.body.message).toEqual(
-        "Safety session started successfully, but notification failed"
+        "Safety session started successfully"
       );
       expect(response.body.safetySession.userId).toEqual(testUserId.toString());
       expect(response.body.safetySession.duration).toEqual(60);
@@ -154,4 +162,55 @@ describe("Safety Session Controller", () => {
       expect(response.body.message).toEqual("Failed to check in");
     });
   });
+
+  describe("overDueSession", () => {
+    beforeEach(async () => {
+      await SafetySession.deleteMany({});
+      jest.clearAllMocks();
+    });
+    test("sends notification for overdue session", async () => {
+      const session = new SafetySession({
+        userId: testUserId,
+        duration: 30, 
+        startTime: new Date(Date.now() - 35 * 60 * 1000),
+        scheduledEndTime: new Date(Date.now() - 5 * 60 * 1000),
+        actualEndTime: null, 
+        overdueNotificationSent: false,
+      });
+      await session.save();
+      await overDueSession();
+      expect(sendSessionOverdueNotifications).toHaveBeenCalledTimes(1);
+      const updatedSession = await SafetySession.findById(session._id)
+      expect(updatedSession.overdueNotificationSent).toBe(true)
+    })
+
+    test("does not send notification for overdue session that already had notification sent", async () => {
+      const session = new SafetySession({
+        userId: testUserId,
+        duration: 30, 
+        startTime: new Date(Date.now() - 35 * 60 * 1000),
+        scheduledEndTime: new Date(Date.now() - 5 * 60 * 1000),
+        actualEndTime: null, 
+        overdueNotificationSent: true,
+      });
+      await session.save();
+      await overDueSession();
+      expect(sendSessionOverdueNotifications).not.toHaveBeenCalled();
+    })
+
+    test("does not send notification for sessions that user have already been checked in", async () => {
+      const session = new SafetySession({
+        userId: testUserId,
+        duration: 30, 
+        startTime: new Date(Date.now() - 35 * 60 * 1000),
+        scheduledEndTime: new Date(Date.now() - 5 * 60 * 1000),
+        actualEndTime: new Date(Date.now() - 2 * 60 * 1000),
+        overdueNotificationSent: false,
+      });
+      await session.save();
+      await overDueSession();
+      expect(sendSessionOverdueNotifications).not.toHaveBeenCalled();
+    })
+  })
 });
+
