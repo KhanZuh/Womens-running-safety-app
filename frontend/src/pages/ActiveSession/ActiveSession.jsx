@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SessionTimeoutModal } from '../../components/SessionTimeoutModal';
+import { PanicButtonActivePage } from '../../components/PanicButtonActive';
 
 export const ActiveSession = () => {
 
@@ -9,6 +10,7 @@ export const ActiveSession = () => {
   const [isLoading, setIsLoading] = useState(true);       // Loading state for UX
   const [error, setError] = useState(null);               // Error handling
   const [showTimeoutModal, setShowTimeoutModal] = useState(false);
+  const [isPanicActivated, setIsPanicActivated] = useState(false);
 
   
   // Navigation hooks 
@@ -67,7 +69,7 @@ export const ActiveSession = () => {
 
   // TIMER LOGIC 
   useEffect(() => {
-  if (!session) return;
+  if (!session || isPanicActivated) return;
 
   const timer = setInterval(() => {
     const now = new Date().getTime();
@@ -88,7 +90,7 @@ export const ActiveSession = () => {
     return () => {
       clearInterval(timer);  // Cleanup when component unmounts
     };
-  }, [session]);
+  }, [session, isPanicActivated]);
 
 
   const handleEndSession = async () => {
@@ -150,6 +152,10 @@ export const ActiveSession = () => {
     }
   };
 
+  const handlePanicActivated = () => {
+    setIsPanicActivated(true);
+  }
+
 
   // Render the loading state, error state
   if (isLoading) {
@@ -174,17 +180,26 @@ export const ActiveSession = () => {
 
   return (
     <div className="min-h-screen bg-base-100 flex flex-col items-center justify-center p-4">
+      {isPanicActivated && (
+        <div/>
+      )}
+      {!isPanicActivated  && 
+        <PanicButtonActivePage sessionId={sessionId} onPanicActivated={handlePanicActivated}/>
+      }
       {/* Header Text */}
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold mb-2">
-          🏃‍♀️ You're on a run!
+          {isPanicActivated ? 'We\'ve contacted your emergency contact' : 
+          '🏃‍♀️ You\'re on a run!'}
         </h1>
         <p className="text-base-content/70">
-          We'll check in when time is up
+          {isPanicActivated ? 'Help is on the way' :
+          'We\'ll check in when time is up'}
         </p>
       </div>
     
       {/* Radial Progress Timer */}
+      {!isPanicActivated &&
       <div className="mb-8">
         <div 
           className="radial-progress text-primary text-4xl font-mono" 
@@ -200,22 +215,24 @@ export const ActiveSession = () => {
           </span>
         </div>
       </div>
-      <div className="divider"></div>
+      }
       {/* Action Buttons */}
       <div className="flex flex-col gap-4 w-full max-w-sm">
+      {!isPanicActivated  && <div className="divider"></div>}
         <button 
           onClick={handleEndSession}
-          className="btn btn-accent btn-sm btn-wide font-bold border-4"
+          className="btn btn-accent btn-sm btn-wide font-bold border-4 self-center"
         >
           👌 I'm Safe Now - End Session
         </button>
-        
+        {!isPanicActivated  && 
         <button 
           onClick={handleExtendTime}
           className="btn btn-outline btn-secondary"
         >
           ⏰ Extend Time +15 mins
         </button>
+}
       </div>
       {/* Session time out Modal */}
       <SessionTimeoutModal 

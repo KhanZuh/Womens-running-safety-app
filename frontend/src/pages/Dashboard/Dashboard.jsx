@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createSafetySession } from "../../services/safetySession";
 import logo from "../../assets/logo-light-grey.png";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import Quote from '../../components/Quote';
 
 export function Dashboard() {
   const [selectedDuration, setSelectedDuration] = useState(null); // Using state to manage selected duration
@@ -49,8 +50,6 @@ export function Dashboard() {
 
   const handleStartRun = async () => {
     const numericDuration = durationToMinutes(selectedDuration);
-
-    console.log("Starting run with duration:", numericDuration);
 
     if (!selectedDuration) {
       alert("Please select a duration before starting the run.");
@@ -133,12 +132,18 @@ export function Dashboard() {
         </button>
 
         <div className="divider"></div>
+        
+          <Quote />
+
+        <div className="divider"></div>
+
 
         {loading ? (
           <p>Loading user info...</p>
         ) : user?.emergencyContact ? (
           <>
             <h2 className="font-bold">Emergency Contact:</h2>
+           
             <div className="bg-primary bg-opacity-10 border border-primary p-4 rounded-lg shadow-md">
               <p>
                 <strong>Name:</strong> {user.emergencyContact.name}

@@ -212,5 +212,70 @@ describe("Safety Session Controller", () => {
       expect(sendSessionOverdueNotifications).not.toHaveBeenCalled();
     })
   })
+
+  describe("POST /safetySessions/:id/panic", () => {
+    let sessionId;
+
+    beforeEach(async () => {
+      // Creating a safety session for testing
+      const session = new SafetySession({
+        userId: testUserId,
+        duration: 60,
+        startTime: new Date(),
+        scheduledEndTime: new Date(Date.now() + 60 * 60 * 1000),
+        panicButtonPressed: false
+      });
+      const savedSession = await session.save();
+      sessionId = savedSession._id;
+    });
+
+    afterEach(async () => {
+      await SafetySession.deleteMany({});
+    });
+
+    test("responds with 200 when panic button is pressed successfully", async () => {
+      const testApp = supertest(app);
+      const response = await testApp.post(`/safetySessions/${sessionId}/panic`).send({
+        userId: testUserId
+      });
+
+      expect(response.status).toEqual(200);
+      expect(response.body.message).toEqual("User pressed the panic button during the SafeRun.");
+      expect(response.body.smsSent).toBeDefined();
+    });
+
+    test("updates safety session with panicButtonPressed", async () => {
+      const testApp = supertest(app);
+      
+      await testApp.post(`/safetySessions/${sessionId}/panic`).send({
+        userId: testUserId
+      });
+
+      const updatedSession = await SafetySession.findById(sessionId);
+      expect(updatedSession.panicButtonPressed).toBe(true);
+    });
+
+    test("responds with 404 when session doesn't exist", async () => {
+      const testApp = supertest(app);
+      const fakeId = "507f1f77bcf86cd799439011";
+
+      const response = await testApp.post(`/safetySessions/${fakeId}/panic`).send({
+        userId: testUserId
+      });
+
+      expect(response.status).toEqual(404);
+      expect(response.body.message).toEqual("Safety session not found");
+    });
+
+    test("responds with 400 when session ID is invalid", async () => {
+      const testApp = supertest(app);
+      const response = await testApp.post("/safetySessions/invalid-id/panic").send({
+        userId: testUserId
+      });
+
+      expect(response.status).toEqual(400);
+      expect(response.body.message).toEqual("Failed to activate panic button.");
+    });
+  });
 });
 

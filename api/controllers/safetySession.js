@@ -1,6 +1,6 @@
 const SafetySession = require("../models/safetySession");
 const User = require("../models/user");
-const {sendSessionStartNotifications, sendSessionEndNotifications, sendSessionExtensionNotifications, sendSessionOverdueNotifications } = require("../lib/twilio");
+const {sendSessionStartNotifications, sendSessionEndNotifications, sendSessionExtensionNotifications, sendSessionOverdueNotifications, sendPanicButtonNotificationsActivePage } = require("../lib/twilio");
 const EmergencyContact = require("../models/emergencyContact");
 
 async function getSafetySession(req, res) {
@@ -179,13 +179,47 @@ async function overDueSession() {
   }
 }
 
+async function panicButtonActivePage(req, res) {
+  try {
+    const sessionId = req.params.id;
+    const {userId} = req.body;
+
+    const session = await SafetySession.findById(sessionId)
+
+    if (!session) {
+      return res.status(404).json({ message: "Safety session not found" });
+    }
+  let user;
+    try {
+      user = await User.findById(userId);
+      const smsResult = await sendPanicButtonNotificationsActivePage(user, session)
+      await SafetySession.findByIdAndUpdate(sessionId, {panicButtonPressed: true})
+      res.status(200).json({
+        message: `User pressed the panic button during the SafeRun.`,
+        smsSent: smsResult
+    });
+    } catch (smsError) {
+      console.error('SMS notification error: ', smsError)
+      await SafetySession.findByIdAndUpdate(sessionId, {panicButtonPressed: true})
+      res.status(200).json({
+        message: `User pressed the panic button during the SafeRun.`, 
+        smsSent: smsError.message
+      })
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "Failed to activate panic button." });
+  }
+}
+
 
 const SafetySessionController = {
   createSafetySession,
   checkIn,
   getSafetySession,
   extendSession,
-  overDueSession
+  overDueSession, 
+  panicButtonActivePage
 };
 
 module.exports = SafetySessionController;
