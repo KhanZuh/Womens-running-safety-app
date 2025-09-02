@@ -41,17 +41,6 @@ function create(req, res) {
   emergencyContact,
 });
   user.save()
-    // .then(savedUser => {
-    //   // savedUser._id is available here
-    //   const emergencyContact = new EmergencyContact({
-    //     userId: savedUser._id,
-    //     name: emergencyName,
-    //     phoneNumber: emergencyPhone,
-    //     relationship: emergencyRelationship,
-    //   });
-
-    //   return emergencyContact.save();
-    // })
     .then(() => {
       res.status(201).json({ message: "User and emergency contact created" });
     })
@@ -64,8 +53,22 @@ function create(req, res) {
     })
   };
 
+  async function show(req, res) {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user); // Includes emergencyContact if it exists
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 const UsersController = {
   create: create,
+  show,
 };
 
 module.exports = UsersController;
