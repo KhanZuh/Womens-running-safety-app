@@ -64,7 +64,7 @@ async function sendSessionExtensionNotifications(user, session) {
     }
 }
 
-// Send notification when session is overdue - will need to get the user name from the users once it's done
+// Send notification when session is overdue (user hasn't checked in at the expected time) - will need to get the user name from the users once it's done
 async function sendSessionOverdueNotifications(user, session) {
     const message = `Alert: Elena has not confirmed they are safe after their running session! Session was scheduled to end at ${session.scheduledEndTime.toLocaleTimeString()}. Please contact them immediately.`;
 
@@ -78,10 +78,24 @@ async function sendSessionOverdueNotifications(user, session) {
     }
 }
 
+
+// Send notification when user presses panic button in the active page
+async function sendPanicButtonNotificationsActivePage(user) {
+  const message = `Alert: Elena pressed the panic button during the SafeRun. Please check in with them immediately.`;
+  try {
+    const result = await sendSMS(emergencyNumber, message);
+    console.log('SMS sent successfully');
+    return result;
+  } catch(error) {
+    console.error(`Failed to send SMS. Error: ${error.message}`)
+  }
+}
+
 module.exports = { 
     sendSMS, 
     sendSessionStartNotifications, 
     sendSessionEndNotifications,
     sendSessionExtensionNotifications, 
-    sendSessionOverdueNotifications
+    sendSessionOverdueNotifications, 
+    sendPanicButtonNotificationsActivePage
 };
