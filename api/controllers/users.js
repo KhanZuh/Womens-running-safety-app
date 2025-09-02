@@ -19,7 +19,7 @@ function create(req, res) {
   }
 
   if (!fullname || fullname.trim().length < 2) {
-    console.log("🚨 Signup validation error:", fullname);
+    console.log("Signup validation error:", fullname);
 
   return res.status(400).json({ message: "Full name must be at least 2 characters" });
 }
