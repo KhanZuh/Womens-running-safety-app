@@ -108,3 +108,29 @@ export const extendSafetySession = async (
     throw error;
   }
 };
+
+export const panicButtonActivePage = async (sessionId) => {
+  try {
+   const response = await fetch(
+      `${BACKEND_URL}/safetySessions/${sessionId}/panic`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 👈 Again no Auth header - as we aren't using auth yet
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to activate panic button");
+    }
+
+    const data = await response.json();
+    return data.safetySession;
+  } catch (error) {
+    console.error("Error extending safety session:", error);
+    throw error;
+  }
+};
