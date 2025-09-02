@@ -9,17 +9,19 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  async function handleSubmit(event) {
-    event.preventDefault();
-    try {
-      const token = await login(email, password);
-      localStorage.setItem("token", token);
-      navigate("/dashboard");
-    } catch (err) {
-      console.error(err);
-      navigate("/login");
-    }
+async function handleSubmit(event) {
+  event.preventDefault();
+  try {
+    const { token, user } = await login(email, password);
+    localStorage.setItem("token", token);
+    localStorage.setItem("userId", user._id);  // store userId here
+    navigate("/dashboard");
+  } catch (err) {
+    console.error(err);
+    navigate("/login");
   }
+}
+
 
   function handleEmailChange(event) {
     setEmail(event.target.value);

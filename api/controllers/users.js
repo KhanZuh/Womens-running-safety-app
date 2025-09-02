@@ -1,17 +1,19 @@
 const User = require("../models/user");
-const EmergencyContact = require("../models/emergencyContact");
+// const EmergencyContact = require("../models/emergencyContact");
 
 
 function create(req, res) {
     console.log("Incoming signup data:", req.body);
 
-  const fullname = req.body.fullname;
-  const email = req.body.email;
-  const password = req.body.password;
-  const preferredTimeOfDay = req.body.preferredTimeOfDay;
-  const numberOfRunsPerWeek = req.body.numberOfRunsPerWeek;
-  const preferredTerrainTypes = req.body.preferredTerrainTypes;
-  const { name: emergencyName, phoneNumber: emergencyPhone, relationship: emergencyRelationship } = req.body.emergencyContact || {};
+  const {
+  email,
+  password,
+  fullname,
+  preferredTimeOfDay,
+  numberOfRunsPerWeek,
+  preferredTerrainTypes,
+  emergencyContact, 
+} = req.body;
 
 
   if (!password || password.length < 8) {
@@ -24,19 +26,21 @@ function create(req, res) {
   return res.status(400).json({ message: "Full name must be at least 2 characters" });
 }
 
-  const user = new User({ fullname, email, password, preferredTimeOfDay, numberOfRunsPerWeek, preferredTerrainTypes });
+  const user = new User({ 
+    fullname, 
+    email, 
+    password, 
+    preferredTimeOfDay, 
+    numberOfRunsPerWeek, 
+    preferredTerrainTypes,
+    emergencyContact,
+  });
+  console.log("Saving user with:", {
+  email,
+  fullname,
+  emergencyContact,
+});
   user.save()
-    .then(savedUser => {
-      // savedUser._id is available here
-      const emergencyContact = new EmergencyContact({
-        userId: savedUser._id,
-        name: emergencyName,
-        phoneNumber: emergencyPhone,
-        relationship: emergencyRelationship,
-      });
-
-      return emergencyContact.save();
-    })
     .then(() => {
       res.status(201).json({ message: "User and emergency contact created" });
     })
@@ -49,8 +53,22 @@ function create(req, res) {
     })
   };
 
+  async function show(req, res) {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user); // Includes emergencyContact if it exists
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 const UsersController = {
   create: create,
+  show,
 };
 
 module.exports = UsersController;
