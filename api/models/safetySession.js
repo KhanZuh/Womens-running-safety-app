@@ -12,6 +12,7 @@ const SafetySessionSchema = new mongoose.Schema({
   startTime: { type: Date, required: true },
   scheduledEndTime: { type: Date, required: true },
   actualEndTime: { type: Date },
+  overdueNotificationSent: {type: Boolean, default: false}
   // can have an enum for status, type string, "active, completed, overdue"
 });
 

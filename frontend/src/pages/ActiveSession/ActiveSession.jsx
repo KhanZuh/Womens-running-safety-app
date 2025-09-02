@@ -16,9 +16,11 @@ export const ActiveSession = () => {
   const navigate = useNavigate();      
   
   // Radial progress element - need to caluclate progress percentage
+  // Old calculation was incremnting the progress bar - flipped the logic so that it noew decrements e.g. countdown style
+  // Shows remianing time - NEW (vs elapsed time - OLD)
   const progressPercentage = session 
-    ? ((session.duration * 60 * 1000 - timeRemaining) / (session.duration * 60 * 1000)) * 100 
-    : 0;
+  ? (timeRemaining / (session.duration * 60 * 1000)) * 100  // remaining divided by total 
+  : 0;
   
   // Format milliseconds into MM:SS display
   // https://stackoverflow.com/questions/29816872/how-can-i-convert-milliseconds-to-hhmmss-format-using-javascript
@@ -74,9 +76,7 @@ export const ActiveSession = () => {
     
     setTimeRemaining(remaining);
     
-    // Temp change for testing modal
-    // if (remaining === 0) { 
-    if (remaining <= (session.duration * 60 * 1000 - 10000)) { // Triggers after 10 seconds
+    if (remaining === 0) { 
 
       console.log('Timer completed! Time to check safety.');
       setShowTimeoutModal(true);

@@ -6,9 +6,9 @@ const EmergencyContactSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-
   name: { type: String, required: true },
   phoneNumber: { type: String, required: true },
+  relationship: { type: String, required: true},
 });
 
 const EmergencyContact = mongoose.model(

@@ -1,7 +1,7 @@
 const SafetySession = require("../models/safetySession");
 const User = require("../models/user");
-
-const {sendSessionStartNotifications, sendSessionEndNotifications, sendSessionExtensionNotifications, sendSessionOverdueNotifications } = require("../lib/twilio")
+const {sendSessionStartNotifications, sendSessionEndNotifications, sendSessionExtensionNotifications, sendSessionOverdueNotifications } = require("../lib/twilio");
+const EmergencyContact = require("../models/emergencyContact");
 
 async function getSafetySession(req, res) {
   try {
@@ -43,7 +43,7 @@ async function createSafetySession(req, res) {
 
     let user;
     try {
-      user = await User.findById(userId).populate("emergencyContact");
+      user = await User.findById(userId);
 
       const smsResult = await sendSessionStartNotifications(user, savedSession);
 
@@ -51,7 +51,7 @@ async function createSafetySession(req, res) {
         message: "Safety session started successfully",
         sessionId: savedSession._id,
         safetySession: savedSession,
-        smsSent: smsResult
+        smsSent: smsResult,
       });
     } catch (smsError) {
       console.error("SMS notification error: ", smsError);
@@ -72,7 +72,7 @@ async function createSafetySession(req, res) {
 async function checkIn(req, res) {
   try {
     const sessionId = req.params.id;
-    const {userId} = req.body;
+    const { userId } = req.body;
 
     const session = await SafetySession.findByIdAndUpdate(
       sessionId,
@@ -86,23 +86,22 @@ async function checkIn(req, res) {
 
     let user;
     try {
-      user = await User.findById(userId).populate('emergencyContact');
+      user = await User.findById(userId);
       const smsResult = await sendSessionEndNotifications(user, session)
 
       res.status(200).json({
         message: "Check-in successful! You're safe.",
         safetySession: session,
-        smsSent: smsResult
-    });
+        smsSent: smsResult,
+      });
     } catch (smsError) {
-      console.error('SMS notification error: ', smsError)
+      console.error("SMS notification error: ", smsError);
       res.status(200).json({
         message: "Check-in successful! You're safe.",
         safetySession: session,
-        notificationError: "SMS notification failed"
+        notificationError: "SMS notification failed",
       });
     }
-
   } catch (err) {
     console.error(err);
     res.status(400).json({ message: "Failed to check in" });
@@ -113,7 +112,7 @@ async function extendSession(req, res) {
   try {
     const sessionId = req.params.id;
     const { additionalMinutes = 15 } = req.body;
-    const {userId} = req.body;
+    const { userId } = req.body;
 
     const session = await SafetySession.findById(sessionId);
 
@@ -133,34 +132,60 @@ async function extendSession(req, res) {
     );
     let user;
     try {
-      user = await User.findById(userId).populate('emergencyContact');
+      user = await User.findById(userId);
       const smsResult = await sendSessionExtensionNotifications(user, session)
       res.status(200).json({
         message: `Session extended by ${additionalMinutes} minutes`,
         safetySession: updatedSession,
-        smsSent: smsResult
-    });
+        smsSent: smsResult,
+      });
     } catch (smsError) {
-      console.error('SMS notification error: ', smsError)
+      console.error("SMS notification error: ", smsError);
       res.status(200).json({
-        message: `Session extended by ${additionalMinutes} minutes`, 
+        message: `Session extended by ${additionalMinutes} minutes`,
         safetySession: updatedSession,
-        smsSent: smsResult
-      })
+        smsSent: smsResult,
+      });
     }
-
-    
   } catch (err) {
     console.error(err);
     res.status(400).json({ message: "Failed to extend session" });
   }
 }
 
+
+async function overDueSession() {
+  try {
+    const current_date = new Date();
+    const fiveMinuteAgo = new Date(current_date.getTime() - (1 * 60 * 1000)); // to be changed to 5 minutes, it's 1minute at the moment
+
+    const overdueSessions = await SafetySession.find({
+      scheduledEndTime: { $lt: fiveMinuteAgo }, // before five minutes
+      actualEndTime: null, 
+      overdueNotificationSent: { $ne: true } // not true
+    });
+
+    for (const session of overdueSessions) {
+      try {
+        const user = await User.findById(session.userId);
+        await sendSessionOverdueNotifications(user, session);
+        await SafetySession.findByIdAndUpdate(session._id, { overdueNotificationSent: true });
+      } catch (error) {
+        console.error(`Failed to send alert for session ${session._id}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error('Error in checkAllOverDueSession:', error);
+  }
+}
+
+
 const SafetySessionController = {
   createSafetySession,
   checkIn,
   getSafetySession,
   extendSession,
+  overDueSession
 };
 
 module.exports = SafetySessionController;

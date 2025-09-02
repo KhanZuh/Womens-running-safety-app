@@ -28,28 +28,31 @@ export async function login(email, password) {
   }
 }
 
-export async function signup(email, password) {
-  const payload = {
-    email: email,
-    password: password,
-  };
+// export async function signup(email, password) {
+//   const payload = {
+//     email: email,
+//     password: password,
+//   };
 
-  const requestOptions = {
+//   const requestOptions = {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(payload),
+//   };
+
+export async function signup(userData) {
+  const response = await fetch(`${BACKEND_URL}/users`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  };
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(userData),
+  });
 
-  let response = await fetch(`${BACKEND_URL}/users`, requestOptions);
-
-  // docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201
   if (response.status === 201) {
     return;
   } else {
-    throw new Error(
-      `Received status ${response.status} when signing up. Expected 201`
-    );
+    const errorData = await response.json();  // 👈 THIS is key
+    throw new Error(errorData.message || `Received status ${response.status}`);
   }
 }

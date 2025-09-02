@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const cron = require("node-cron");
 
 const usersRouter = require("./routes/users");
 const safetySessionRouter = require("./routes/safetySession");
@@ -8,6 +9,11 @@ const emergencyContactsRouter = require("./routes/emergencyContacts");
 const quotesRouter = require("./routes/quotes");
 const authenticationRouter = require("./routes/authentication");
 const tokenChecker = require("./middleware/tokenChecker");
+const {overDueSession} = require("./controllers/safetySession");
+
+cron.schedule("*/1 * * * *", () => { // this will need to change to 5 minutes, currently is set for 1 minute
+  overDueSession();
+})
 
 const app = express();
 
@@ -35,5 +41,6 @@ app.use((err, _req, res, _next) => {
     res.status(500).json({ err: "Something went wrong" });
   }
 });
+
 
 module.exports = app;
