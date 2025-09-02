@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "node --watch index.js",
     "test": "jest",
-    "seed": "node seeds/seed.js"
+    "seed": "node seeds/seed.js",
     "test:force": "jest --forceExit"
   },
   "author": "Makers Academy",
