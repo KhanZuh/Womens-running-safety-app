@@ -4,7 +4,7 @@ require("../mongodb_helper");
 const SafetySession = require("../../models/safetySession");
 const User = require("../../models/user");
 const { overDueSession } = require("../../controllers/safetySession");
-const { sendSessionOverdueNotifications } = require("../../lib/twilio");
+const { sendSessionOverdueNotifications, sendPanicButtonNotificationsActivePage } = require("../../lib/twilio");
 
 jest.mock('../../lib/twilio', () => ({
   sendSessionStartNotifications: jest.fn().mockResolvedValue({
@@ -15,7 +15,10 @@ jest.mock('../../lib/twilio', () => ({
   }),
   sendSessionEndNotifications: jest.fn().mockResolvedValue({
     success: true
-  })
+  }), 
+  sendPanicButtonNotificationsActivePage: jest.fn().mockResolvedValue({
+    success: true
+  }),
 }));
 
 describe("Safety Session Controller", () => {
@@ -27,6 +30,7 @@ describe("Safety Session Controller", () => {
     const user = new User({
       email: "safety-test@test.com",
       password: "12345678",
+      fullname: "Poppy Smith"
     });
     const savedUser = await user.save();
     testUserId = savedUser._id;
@@ -235,9 +239,7 @@ describe("Safety Session Controller", () => {
 
     test("responds with 200 when panic button is pressed successfully", async () => {
       const testApp = supertest(app);
-      const response = await testApp.post(`/safetySessions/${sessionId}/panic`).send({
-        userId: testUserId
-      });
+      const response = await testApp.post(`/safetySessions/${sessionId}/panic`)
 
       expect(response.status).toEqual(200);
       expect(response.body.message).toEqual("User pressed the panic button during the SafeRun.");
@@ -247,9 +249,7 @@ describe("Safety Session Controller", () => {
     test("updates safety session with panicButtonPressed", async () => {
       const testApp = supertest(app);
       
-      await testApp.post(`/safetySessions/${sessionId}/panic`).send({
-        userId: testUserId
-      });
+      await testApp.post(`/safetySessions/${sessionId}/panic`)
 
       const updatedSession = await SafetySession.findById(sessionId);
       expect(updatedSession.panicButtonPressed).toBe(true);
@@ -259,9 +259,7 @@ describe("Safety Session Controller", () => {
       const testApp = supertest(app);
       const fakeId = "507f1f77bcf86cd799439011";
 
-      const response = await testApp.post(`/safetySessions/${fakeId}/panic`).send({
-        userId: testUserId
-      });
+      const response = await testApp.post(`/safetySessions/${fakeId}/panic`)
 
       expect(response.status).toEqual(404);
       expect(response.body.message).toEqual("Safety session not found");
@@ -269,9 +267,7 @@ describe("Safety Session Controller", () => {
 
     test("responds with 400 when session ID is invalid", async () => {
       const testApp = supertest(app);
-      const response = await testApp.post("/safetySessions/invalid-id/panic").send({
-        userId: testUserId
-      });
+      const response = await testApp.post("/safetySessions/invalid-id/panic")
 
       expect(response.status).toEqual(400);
       expect(response.body.message).toEqual("Failed to activate panic button.");
