@@ -7,6 +7,8 @@ import { SignupPage } from "./pages/Signup/SignupPage";
 import { FeedPage } from "./pages/Feed/FeedPage";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
 import { ActiveSession } from "./pages/ActiveSession/ActiveSession";
+import LocationSession from "./pages/LocationSession/LocationSession";
+
 
 import Footer from "./components/Footer";
 
@@ -35,6 +37,10 @@ const router = createBrowserRouter([
   {
     path: "/active/:sessionId", 
     element: <ActiveSession />,
+  },
+  {
+    path: "/location-session/:sessionId",
+    element: <LocationSession />
   }
 ]);
 

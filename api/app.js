@@ -1,8 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const locationSafetySessionRouter = require("./routes/locationSafetySessions");
 const cron = require("node-cron");
-
 const usersRouter = require("./routes/users");
 const safetySessionRouter = require("./routes/safetySession");
 const quotesRouter = require("./routes/quotes");
@@ -24,6 +24,7 @@ app.use("/users", usersRouter);
 app.use("/safetySessions", safetySessionRouter);
 app.use("/quotes", quotesRouter);
 app.use("/tokens", authenticationRouter);
+app.use("/locationSafetySessions", locationSafetySessionRouter);
 
 // 404 Handler
 app.use((_req, res) => {

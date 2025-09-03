@@ -1,3 +1,7 @@
+/* Leaflet CSS - for map */
+@import 'leaflet/dist/leaflet.css';
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -26,4 +30,10 @@ body {
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+}
+
+/* For interferring attribution on location saftey session check in modal */
+/* Just moves this modal pop up a few pixels higher - as legally we need to show the attribution */
+.safety-check-modal .modal-box {
+    transform: translateY(-100px) !important;
 }
