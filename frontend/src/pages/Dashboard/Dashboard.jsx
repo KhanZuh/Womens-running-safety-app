@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createSafetySession } from "../../services/safetySession";
 import logo from "../../assets/logo-light-grey.png";
@@ -57,7 +57,7 @@ export function Dashboard() {
     }
 
     try {
-      const userId = "64ff0e2ab123456789abcdef";
+      const userId = localStorage.getItem("userId"); // EM changed this - it was hardcoded
       console.log("Calling createSafetySession with:", {
         userId,
         duration: numericDuration,
@@ -88,7 +88,7 @@ export function Dashboard() {
     }
   };
 
-  const durations = ["30 minutes", "1 hour", "2 hours"];
+  const durations = ["1 minutes", "1 hour", "2 hours"];
 
   return (
     <>
