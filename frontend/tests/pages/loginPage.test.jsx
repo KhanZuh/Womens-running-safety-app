@@ -26,7 +26,7 @@ async function completeLoginForm() {
 
   const emailInputEl = screen.getByLabelText("Email:");
   const passwordInputEl = screen.getByLabelText("Password:");
-  const submitButtonEl = screen.getByRole("submit-button");
+  const submitButtonEl = screen.getByRole("button", { name: /submit/i });
 
   await user.type(emailInputEl, "test@email.com");
   await user.type(passwordInputEl, "1234");
@@ -47,14 +47,16 @@ describe("Login Page", () => {
   });
 
   test("navigates to /posts on successful login", async () => {
-    render(<LoginPage />);
+    login.mockResolvedValue({
+      token: "secrettoken123",
+      user: { _id: "abc123" },
+    });
 
-    login.mockResolvedValue("secrettoken123");
     const navigateMock = useNavigate();
-
+    render(<LoginPage />);
     await completeLoginForm();
 
-    expect(navigateMock).toHaveBeenCalledWith("/posts");
+    expect(navigateMock).toHaveBeenCalledWith("/dashboard");
   });
 
   test("navigates to /login on unsuccessful login", async () => {

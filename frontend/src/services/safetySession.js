@@ -111,7 +111,7 @@ export const extendSafetySession = async (
 
 export const panicButtonActivePage = async (sessionId) => {
   try {
-   const response = await fetch(
+    const response = await fetch(
       `${BACKEND_URL}/safetySessions/${sessionId}/panic`,
       {
         method: "POST",
