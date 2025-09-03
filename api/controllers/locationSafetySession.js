@@ -1,4 +1,4 @@
-const LocationSafetySession = require("../models/LocationSafetySession");
+const LocationSafetySession = require("../models/locationSafetySession");
 
 // Helper function to calculate distance between two points
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
