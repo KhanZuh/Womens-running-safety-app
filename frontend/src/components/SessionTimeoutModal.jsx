@@ -77,54 +77,54 @@ export function SessionTimeoutModal({ isOpen, onClose, onConfirm }) {
 
 
 
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full text-center">
-            {!isConfirmedSafe ? (
-            <>
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+    <div className="bg-base-100 rounded-lg shadow-lg p-6 max-w-md w-full text-center border-4 border-accent">
+        {!isConfirmedSafe ? (
+        <>
+            <h2 className="text-3xl font-semibold mb-4 text-accent">
             {isTimeUp ? "Time's up!" : "Your time is up!"}
             </h2>
 
-            <p className="text-gray-700 mb-2">
+            <p className="text-white mb-2">
             {isTimeUp
                 ? "We’re contacting your emergency contact..."
                 : "Are you safe?"}
             </p>
 
-            <p className="text-gray-700 mb-4">
+            <p className="text-white mb-4">
             {isTimeUp
                 ? "If you're okay, click the button below to stop the alert."
                 : "Please confirm within 5 minutes or we'll notify your emergency contact."}
             </p>
 
-            <p className="text-xl font-mono text-red-600 mb-4">
+            <p className="text-xl font-mono text-error mb-4">
             {formatTime(timeLeft)}
             </p>
 
             <button
-                onClick={handleConfirmSafe}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            onClick={handleConfirmSafe}
+            className="btn btn-accent text-xl btn-wide font-bold"
             >
-                I'm Safe
+            I'm Safe
             </button>
-            </>
+        </>
         ) : (
-            <>
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
-                Glad you're safe!
+        <>
+            <h2 className="text-xl font-semibold mb-4 text-accent">
+            Glad you're safe!
             </h2>
             <p className="text-gray-700 mb-6">See you next time 👋</p>
 
             <button
-                onClick={onClose}
-                className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+            onClick={onClose}
+            className="btn btn-outline btn-accent"
             >
-                Close
+            Close
             </button>
-            </>
+        </>
         )}
-        </div>
     </div>
-    );
+    </div>
+);
 }
