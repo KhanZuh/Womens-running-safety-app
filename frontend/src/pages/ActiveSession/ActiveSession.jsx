@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SessionTimeoutModal } from '../../components/SessionTimeoutModal';
 import { PanicButtonActivePage } from '../../components/PanicButtonActive';
+import Navbar from "../../components/Navbar";
 
 export const ActiveSession = () => {
 
@@ -179,13 +180,17 @@ export const ActiveSession = () => {
   // Render the UI
 
   return (
+    <main>
+    <Navbar 
+      showPanicButton = {!isPanicActivated}
+      sessionId = {sessionId}
+      onPanicActivated = {handlePanicActivated}
+    />
     <div className="min-h-screen bg-base-100 flex flex-col items-center justify-center p-4">
       {isPanicActivated && (
         <div/>
       )}
-      {!isPanicActivated  && 
-        <PanicButtonActivePage sessionId={sessionId} onPanicActivated={handlePanicActivated}/>
-      }
+
       {/* Header Text */}
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold mb-2">
@@ -247,5 +252,6 @@ export const ActiveSession = () => {
         }}
       />
     </div>
+    </main>
   );
 };
