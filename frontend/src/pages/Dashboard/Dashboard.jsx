@@ -4,21 +4,18 @@ import { createSafetySession } from "../../services/safetySession";
 import logo from '../../assets/logo-light-grey.png';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import LocationPicker from "../../components/LocationPicker";
+import { createLocationSafetySession } from "../../services/locationSafetySession";
 
-// // //Testing the Modal: Delete after before pushing
-// // import { SessionTimeoutModal } from "../../components/SessionTimeoutModal";    
-// // //End 
-// export function Dashboard() {
-// //     //Testing the Modal: Delete after before pushing
-// //     const [modalOpen, setModalOpen] = useState(false);
-// // //End 
-//     const [selectedDuration, setSelectedDuration] = useState(null); // Using state to manage selected duration
-//     const navigate = useNavigate();
 
 
 export function Dashboard() {
 
-    const [selectedDuration, setSelectedDuration] = useState(null); // Using state to manage selected duration
+    const [sessionType, setSessionType] = useState('timer'); 
+    const [startCoords, setStartCoords] = useState(null);
+    const [endCoords, setEndCoords] = useState(null);
+    const [mapCenter, setMapCenter] = useState([51.505, -0.09]); // Setting the Default to London
+    const [selectedDuration, setSelectedDuration] = useState(null); 
     const navigate = useNavigate();
 
 
@@ -76,53 +73,117 @@ export function Dashboard() {
     };
 
     const durations = ['30 minutes', '1 hour', '2 hours'];
+    
+    const handleStartLocationRun = async () => {
+    console.log('Starting location-based run:', { startCoords, endCoords });
+
+    if (!startCoords || !endCoords) {
+        alert("Please select both start and end points on the map.");
+        return;
+    }
+
+    try {
+        const userId = "64ff0e2ab123456789abcdef";
+        
+        const data = await createLocationSafetySession({ 
+            userId, 
+            startCoords,
+            endCoords
+        });
+        
+        console.log('Location session created:', data);
+        
+        // Navigate to location session (not regular active session which was previous)
+        navigate(`/location-session/${data.safetySession._id}`);
+        
+    } catch (err) {
+        console.error('Error starting location run:', err);
+        alert(`Failed to start location run: ${err.message}`);
+    }
+};
 
 
-    return (
-        <>
-            <Navbar />
-            <main className="flex flex-col justify-center items-center min-h-screen w-full text-center space-y-6">
-            {/* <h1>SafeRun</h1> */}
+return (
+    <>
+        <Navbar />
+        <main className="flex flex-col justify-center items-center min-h-screen w-full text-center space-y-6">
             <img src={logo} alt="SafeRun logo" className="w-72 mx-auto" />
-
-            <h2 className = "font-bold">Let someone know you're running - just in case.</h2>
-            <p>Enter your estimated run and we'll handle the rest.</p>
-
-            <div className="divider"></div>
-
-            <p>How long will you run?</p>
-
-            <div className="flex flex-wrap justify-center gap-4">
-                {durations.map((duration) => {
-                    const isSelected = selectedDuration === duration;
-                    return (
-                        <button
-                            key={duration}
-                            onClick={() => {
-                                console.log(`Duration selected: ${duration}`);
-                                setSelectedDuration(duration);
-                            }}
-                            className={`btn btn-sm ${isSelected ? 'btn-accent' : 'btn-outline btn-accent'}`}
-                        >
-                            {duration}
-                        </button>
-                    );
-                })}
+            <h2 className="font-bold">Let someone know you're running - just in case.</h2>
+            
+            {/* Session Type Toggle */}
+            <div className="flex gap-4 mb-6">
+                <button
+                    onClick={() => setSessionType('timer')}
+                    className={`btn btn-sm ${sessionType === 'timer' ? 'btn-accent' : 'btn-outline btn-accent'}`}
+                >
+                    ⏱️ Timer Based
+                </button>
+                <button
+                    onClick={() => setSessionType('location')}
+                    className={`btn btn-sm ${sessionType === 'location' ? 'btn-accent' : 'btn-outline btn-accent'}`}
+                >
+                    📍 Location Based
+                </button>
             </div>
 
-            <button onClick={handleStartRun} className="btn btn-accent btn-sm btn-wide font-bold border-4">Start Run</button>
+            <div className="divider"></div>
+
+            {/* Conditional rendering on session type selected */}
+            {sessionType === 'timer' ? (
+                <>
+                    <p>How long will you run?</p>
+                    <div className="flex flex-wrap justify-center gap-4">
+                        {durations.map((duration) => {
+                            const isSelected = selectedDuration === duration;
+                            return (
+                                <button
+                                    key={duration}
+                                    onClick={() => {
+                                        console.log(`Duration selected: ${duration}`);
+                                        setSelectedDuration(duration);
+                                    }}
+                                    className={`btn btn-sm ${isSelected ? 'btn-accent' : 'btn-outline btn-accent'}`}
+                                >
+                                    {duration}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </>
+            ) : (
+                // Location-based UI
+                <>
+                    <p>Your current location will be the start point. Select your destination on the map.</p>
+                    <LocationPicker 
+                        startCoords={startCoords}
+                        endCoords={endCoords}
+                        onStartChange={setStartCoords}
+                        onEndChange={setEndCoords}
+                        mapCenter={mapCenter}
+                        setMapCenter={setMapCenter}
+                    />
+                </>
+            )}
+
+            {/* Update Start Run Button */}
+            <button 
+                onClick={sessionType === 'timer' ? handleStartRun : handleStartLocationRun} 
+                className="btn btn-accent btn-sm btn-wide font-bold border-4"
+                disabled={sessionType === 'location' && (!startCoords || !endCoords)}
+            >
+                Start Run
+            </button>
 
             <div className="divider"></div>
 
-            <h2 className = "font-bold">Emergency Contact:</h2>
+            {/* Emergency contact section */}
+            <h2 className="font-bold">Emergency Contact:</h2>
             <div className="bg-primary bg-opacity-10 border border-primary p-4 rounded-lg shadow-md">
-            <p>Name: Jane Doe</p>
-            <p>Email: janedoe@example.com</p>
+                <p>Name: Jane Doe</p>
+                <p>Email: janedoe@example.com</p>
             </div>
-
             </main>
             <Footer />
-        </>
-    );
-}
-
+            </>
+            );
+        }

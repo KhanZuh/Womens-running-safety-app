@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
+const locationSafetySessionRouter = require("./routes/locationSafetySessions");
 const usersRouter = require("./routes/users");
 const safetySessionRouter = require("./routes/safetySession");
 const emergencyContactsRouter = require("./routes/emergencyContacts");
@@ -18,6 +18,7 @@ app.use("/users", usersRouter);
 app.use("/safetySessions", safetySessionRouter);
 app.use("/emergencyContacts", emergencyContactsRouter);
 app.use("/tokens", authenticationRouter);
+app.use("/locationSafetySessions", locationSafetySessionRouter);
 
 // 404 Handler
 app.use((_req, res) => {

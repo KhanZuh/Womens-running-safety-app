@@ -1,3 +1,7 @@
+/* Leaflet CSS - for map */
+@import 'leaflet/dist/leaflet.css';
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -26,4 +30,9 @@ body {
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+}
+
+/* Hide the leaflet/Geoapify attribution in modals - messes witht the modal apperance */
+.modal .leaflet-control-attribution {
+    display: none !important;
 }
