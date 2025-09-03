@@ -24,12 +24,23 @@ vi.mock("../../src/services/authentication", () => {
 async function completeSignupForm() {
   const user = userEvent.setup();
 
-  const emailInputEl = screen.getByLabelText("Email:");
-  const passwordInputEl = screen.getByLabelText("Password:");
-  const submitButtonEl = screen.getByRole("submit-button");
+  const fullnameInputEl = screen.getByLabelText(/full name/i);
+  const emailInputEl = screen.getByLabelText(/email/i);
+  const passwordInputEl = screen.getByLabelText(/password/i);
+  const emergencyNameEl = screen.getByLabelText(/emergency contact name/i);
+  const emergencyPhoneEl = screen.getByLabelText(/emergency contact phone/i);
+  const emergencyRelationshipEl = screen.getByLabelText(
+    /emergency contact relationship/i
+  );
+  const submitButtonEl = screen.getByRole("button", { name: /submit/i });
 
+  await user.type(fullnameInputEl, "Testy McTest");
   await user.type(emailInputEl, "test@email.com");
-  await user.type(passwordInputEl, "1234");
+  await user.type(passwordInputEl, "12345678"); // must be at least 8 chars
+  await user.type(emergencyNameEl, "John Doe");
+  await user.type(emergencyPhoneEl, "123-456-7890");
+  await user.type(emergencyRelationshipEl, "Brother");
+
   await user.click(submitButtonEl);
 }
 
@@ -43,7 +54,18 @@ describe("Signup Page", () => {
 
     await completeSignupForm();
 
-    expect(signup).toHaveBeenCalledWith("test@email.com", "1234");
+    expect(signup).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: "test@email.com",
+        password: "12345678",
+        fullname: "Testy McTest",
+        emergencyContact: expect.objectContaining({
+          name: "John Doe",
+          phoneNumber: "123-456-7890",
+          relationship: "Brother",
+        }),
+      })
+    );
   });
 
   test("navigates to /login on successful signup", async () => {
@@ -56,14 +78,18 @@ describe("Signup Page", () => {
     expect(navigateMock).toHaveBeenCalledWith("/login");
   });
 
-  test("navigates to /signup on unsuccessful signup", async () => {
-    render(<SignupPage />);
-
+  test("shows error message on unsuccessful signup", async () => {
     signup.mockRejectedValue(new Error("Error signing up"));
-    const navigateMock = useNavigate();
 
+    render(<SignupPage />);
     await completeSignupForm();
 
-    expect(navigateMock).toHaveBeenCalledWith("/signup");
+    // navigate should not be called
+    const navigateMock = useNavigate();
+    expect(navigateMock).not.toHaveBeenCalled();
+
+    // assert error message is shown
+    const errorMessage = await screen.findByText(/error signing up/i);
+    expect(errorMessage).to.exist; // Chai syntax
   });
 });

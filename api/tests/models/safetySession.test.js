@@ -9,6 +9,7 @@ describe("SafetySession model", () => {
     const user = new User({
       email: "model-test@test.com",
       password: "12345678",
+      fullname: "Someone"
     });
     const savedUser = await user.save();
     testUserId = savedUser._id;

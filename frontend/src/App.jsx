@@ -10,6 +10,8 @@ import { ActiveSession } from "./pages/ActiveSession/ActiveSession";
 import LocationSession from "./pages/LocationSession/LocationSession";
 
 
+import Footer from "./components/Footer";
+
 // docs: https://reactrouter.com/en/main/start/overview
 const router = createBrowserRouter([
   {
@@ -46,6 +48,7 @@ function App() {
   return (
     <>
       <RouterProvider router={router} />
+      <Footer />
     </>
   );
 }

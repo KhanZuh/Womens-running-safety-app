@@ -14,7 +14,10 @@ describe("authentication service", () => {
       const testEmail = "test@testEmail.com";
       const testPassword = "12345678";
 
-      fetch.mockResponseOnce(JSON.stringify({ token: "testToken" }), {
+      fetch.mockResponseOnce(JSON.stringify({ 
+        token: "testToken",
+        user: { id: "123", email: "test@testemail.com"}
+      }), {
         status: 201,
       });
 
@@ -34,16 +37,23 @@ describe("authentication service", () => {
     });
 
     test("returns the token if the request was a success", async () => {
-      const testEmail = "test@testEmail.com";
-      const testPassword = "12345678";
+  const testEmail = "test@testEmail.com";
+  const testPassword = "12345678";
 
-      fetch.mockResponseOnce(JSON.stringify({ token: "testToken" }), {
-        status: 201,
-      });
+  fetch.mockResponseOnce(JSON.stringify({ 
+    token: "testToken",
+    user: { id: "123", email: "test@testEmail.com" }
+  }), {
+    status: 201,
+  });
 
-      const token = await login(testEmail, testPassword);
-      expect(token).toEqual("testToken");
-    });
+  const result = await login(testEmail, testPassword);
+  expect(result).toEqual({ 
+    token: "testToken", 
+    user: { id: "123", email: "test@testEmail.com" }
+  });
+});
+    
 
     test("throws an error if the request failed", async () => {
       const testEmail = "test@testEmail.com";
@@ -65,14 +75,16 @@ describe("authentication service", () => {
 
   describe("signup", () => {
     test("calls the backend url for a token", async () => {
-      const testEmail = "test@testEmail.com";
-      const testPassword = "12345678";
+      const testUserData = {
+        email: "test@testemail.com",
+        password: "12345678"
+      };
 
       fetch.mockResponseOnce("", {
         status: 201,
       });
 
-      await signup(testEmail, testPassword);
+      await signup(testUserData);
 
       // This is an array of the arguments that were last passed to fetch
       const fetchArguments = fetch.mock.lastCall;
@@ -82,7 +94,7 @@ describe("authentication service", () => {
       expect(url).toEqual(`${BACKEND_URL}/users`);
       expect(options.method).toEqual("POST");
       expect(options.body).toEqual(
-        JSON.stringify({ email: testEmail, password: testPassword })
+        JSON.stringify(testUserData)
       );
       expect(options.headers["Content-Type"]).toEqual("application/json");
     });
@@ -100,8 +112,10 @@ describe("authentication service", () => {
     });
 
     test("throws an error if the request failed", async () => {
-      const testEmail = "test@testEmail.com";
-      const testPassword = "12345678";
+        const testUserData = {
+        email: "test@testemail.com",
+        password: "12345678"
+      };
 
       fetch.mockResponseOnce(
         JSON.stringify({ message: "User already exists" }),
@@ -111,10 +125,10 @@ describe("authentication service", () => {
       );
 
       try {
-        await signup(testEmail, testPassword);
+        await signup(testUserData);
       } catch (err) {
         expect(err.message).toEqual(
-          "Received status 400 when signing up. Expected 201"
+          "User already exists"
         );
       }
     });

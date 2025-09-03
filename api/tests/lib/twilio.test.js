@@ -15,6 +15,8 @@ const mockSendSMS = jest.fn();
 const mockSendSessionStartNotifications = jest.fn();
 const mockSendSessionEndNotifications = jest.fn();
 const mockSendSessionExtensionNotifications = jest.fn();
+const mockSendSessionOverdueNotifications = jest.fn();
+const mockSendPanicButtonNotificationsActivePage = jest.fn();
 
 jest.mock('../../lib/twilio', () => {
   return {
@@ -22,14 +24,16 @@ jest.mock('../../lib/twilio', () => {
     sendSessionStartNotifications: mockSendSessionStartNotifications,
     sendSessionEndNotifications: mockSendSessionEndNotifications,
     sendSessionExtensionNotifications: mockSendSessionExtensionNotifications,
+    sendSessionOverdueNotifications: mockSendSessionOverdueNotifications,
+    sendPanicButtonNotificationsActivePage: mockSendPanicButtonNotificationsActivePage,
     twilio_number: '+1234567890'
   };
 });
 
-const { sendSMS, sendSessionStartNotifications, sendSessionEndNotifications, sendSessionExtensionNotifications} = require('../../lib/twilio');
+const { sendSMS, sendSessionStartNotifications, sendSessionEndNotifications, sendSessionExtensionNotifications, sendSessionOverdueNotifications, sendPanicButtonNotificationsActivePage} = require('../../lib/twilio');
 
 describe('Twilio Service', () => {
-  const emergencyNumber = '+19173528634';
+  const emergencyNumber = '+11234567890';
   
   beforeEach(() => {
     jest.clearAllMocks();
@@ -106,6 +110,33 @@ describe('Twilio Service', () => {
       const session = { scheduledEndTime };
       const result = await sendSessionExtensionNotifications(null, session);
       expect(mockSendSessionExtensionNotifications).toHaveBeenCalledWith(null, session);
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe("sendSessionOverdueNotifications", () => {
+    test("Should send overdue notifications with correct message", async () => {
+      const mockResponse = {sid: 'SM1234567890', status: 'sent'};
+      mockSendSessionOverdueNotifications.mockResolvedValue(mockResponse)
+      const scheduledEndTime = new Date();
+      scheduledEndTime.setHours(14, 30, 0); // 2.30pm
+      const session = { scheduledEndTime, userId: '123' };
+      const result = await sendSessionOverdueNotifications(null, session);
+      expect(mockSendSessionOverdueNotifications).toHaveBeenCalledWith(null, session);
+      expect(result).toEqual(mockResponse);
+    })
+  })
+
+  describe("sendPanicButtonNotificationsActivePage", () => {
+    test("Should send alert notification with correct message", async () => {
+      const mockResponse = {sid: 'SM1234567890', status: 'sent'};
+      const scheduledEndTime = new Date();
+      const session = { scheduledEndTime, userId: '123' };
+      
+      mockSendPanicButtonNotificationsActivePage.mockResolvedValue(mockResponse);
+      
+      const result = await sendPanicButtonNotificationsActivePage(null, session);
+      expect(mockSendPanicButtonNotificationsActivePage).toHaveBeenCalledWith(null, session);
       expect(result).toEqual(mockResponse);
     });
   });

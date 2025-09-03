@@ -3,11 +3,22 @@ const supertest = require("supertest");
 require("../mongodb_helper");
 const SafetySession = require("../../models/safetySession");
 const User = require("../../models/user");
+const { overDueSession } = require("../../controllers/safetySession");
+const { sendSessionOverdueNotifications, sendPanicButtonNotificationsActivePage } = require("../../lib/twilio");
 
 jest.mock('../../lib/twilio', () => ({
   sendSessionStartNotifications: jest.fn().mockResolvedValue({
     success: true
-  })
+  }),
+  sendSessionOverdueNotifications: jest.fn().mockResolvedValue({
+    success: true
+  }),
+  sendSessionEndNotifications: jest.fn().mockResolvedValue({
+    success: true
+  }), 
+  sendPanicButtonNotificationsActivePage: jest.fn().mockResolvedValue({
+    success: true
+  }),
 }));
 
 describe("Safety Session Controller", () => {
@@ -19,6 +30,7 @@ describe("Safety Session Controller", () => {
     const user = new User({
       email: "safety-test@test.com",
       password: "12345678",
+      fullname: "Poppy Smith"
     });
     const savedUser = await user.save();
     testUserId = savedUser._id;
@@ -43,7 +55,7 @@ describe("Safety Session Controller", () => {
 
       expect(response.status).toEqual(201);
       expect(response.body.message).toEqual(
-        "Safety session started successfully, but notification failed"
+        "Safety session started successfully"
       );
       expect(response.body.safetySession.userId).toEqual(testUserId.toString());
       expect(response.body.safetySession.duration).toEqual(60);
@@ -154,4 +166,112 @@ describe("Safety Session Controller", () => {
       expect(response.body.message).toEqual("Failed to check in");
     });
   });
+
+  describe("overDueSession", () => {
+    beforeEach(async () => {
+      await SafetySession.deleteMany({});
+      jest.clearAllMocks();
+    });
+    test("sends notification for overdue session", async () => {
+      const session = new SafetySession({
+        userId: testUserId,
+        duration: 30, 
+        startTime: new Date(Date.now() - 35 * 60 * 1000),
+        scheduledEndTime: new Date(Date.now() - 5 * 60 * 1000),
+        actualEndTime: null, 
+        overdueNotificationSent: false,
+      });
+      await session.save();
+      await overDueSession();
+      expect(sendSessionOverdueNotifications).toHaveBeenCalledTimes(1);
+      const updatedSession = await SafetySession.findById(session._id)
+      expect(updatedSession.overdueNotificationSent).toBe(true)
+    })
+
+    test("does not send notification for overdue session that already had notification sent", async () => {
+      const session = new SafetySession({
+        userId: testUserId,
+        duration: 30, 
+        startTime: new Date(Date.now() - 35 * 60 * 1000),
+        scheduledEndTime: new Date(Date.now() - 5 * 60 * 1000),
+        actualEndTime: null, 
+        overdueNotificationSent: true,
+      });
+      await session.save();
+      await overDueSession();
+      expect(sendSessionOverdueNotifications).not.toHaveBeenCalled();
+    })
+
+    test("does not send notification for sessions that user have already been checked in", async () => {
+      const session = new SafetySession({
+        userId: testUserId,
+        duration: 30, 
+        startTime: new Date(Date.now() - 35 * 60 * 1000),
+        scheduledEndTime: new Date(Date.now() - 5 * 60 * 1000),
+        actualEndTime: new Date(Date.now() - 2 * 60 * 1000),
+        overdueNotificationSent: false,
+      });
+      await session.save();
+      await overDueSession();
+      expect(sendSessionOverdueNotifications).not.toHaveBeenCalled();
+    })
+  })
+
+  describe("POST /safetySessions/:id/panic", () => {
+    let sessionId;
+
+    beforeEach(async () => {
+      // Creating a safety session for testing
+      const session = new SafetySession({
+        userId: testUserId,
+        duration: 60,
+        startTime: new Date(),
+        scheduledEndTime: new Date(Date.now() + 60 * 60 * 1000),
+        panicButtonPressed: false
+      });
+      const savedSession = await session.save();
+      sessionId = savedSession._id;
+    });
+
+    afterEach(async () => {
+      await SafetySession.deleteMany({});
+    });
+
+    test("responds with 200 when panic button is pressed successfully", async () => {
+      const testApp = supertest(app);
+      const response = await testApp.post(`/safetySessions/${sessionId}/panic`)
+
+      expect(response.status).toEqual(200);
+      expect(response.body.message).toEqual("User pressed the panic button during the SafeRun.");
+      expect(response.body.smsSent).toBeDefined();
+    });
+
+    test("updates safety session with panicButtonPressed", async () => {
+      const testApp = supertest(app);
+      
+      await testApp.post(`/safetySessions/${sessionId}/panic`)
+
+      const updatedSession = await SafetySession.findById(sessionId);
+      expect(updatedSession.panicButtonPressed).toBe(true);
+    });
+
+    test("responds with 404 when session doesn't exist", async () => {
+      const testApp = supertest(app);
+      const fakeId = "507f1f77bcf86cd799439011";
+
+      const response = await testApp.post(`/safetySessions/${fakeId}/panic`)
+
+      expect(response.status).toEqual(404);
+      expect(response.body.message).toEqual("Safety session not found");
+    });
+
+    test("responds with 400 when session ID is invalid", async () => {
+      const testApp = supertest(app);
+      const response = await testApp.post("/safetySessions/invalid-id/panic")
+
+      expect(response.status).toEqual(400);
+      expect(response.body.message).toEqual("Failed to activate panic button.");
+    });
+  });
 });
+

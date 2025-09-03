@@ -7,7 +7,7 @@ const client = new twilio(
 
 const twilio_number = process.env.TWILIO_PHONE_NUMBER;
 
-const emergencyNumber = "+191735286346"; // hardcoded number - this will need to change - added a six so that this feature doesn't work for rate limiting purposes
+// const emergencyNumber = "+19173528634"; // This can now be deleted, leaving it for now in case anyone needs as reference
 
 async function sendSMS(to, message) {
   try {
@@ -22,12 +22,12 @@ async function sendSMS(to, message) {
   }
 }
 
-// Send notification when starting session - will need to get the user name from the users once it's done
+// Send notification when starting session 
 async function sendSessionStartNotifications(user, session) {
-  const message = `Elena started a run using SafeRun. They plan to run for ${session.duration} minutes. You'll be notified again when they confirm they're safe.`;
+  const message = `${user.fullname} started a run using SafeRun. They plan to run for ${session.duration} minutes. You'll be notified again when they confirm they're safe.`;
 
   try {
-    const result = await sendSMS(emergencyNumber, message);
+    const result = await sendSMS(user.emergencyContact.phoneNumber, message);
     console.log("SMS sent successfully.");
     return result;
   } catch (error) {
@@ -35,12 +35,12 @@ async function sendSessionStartNotifications(user, session) {
   }
 }
 
-// Send notification when ending session - will need to get the user name from the users once it's done
+// Send notification when ending session 
 async function sendSessionEndNotifications(user, session) {
-    const message = `Update: Elena has safely finished their SafeRun at ${session.actualEndTime.toLocaleTimeString()}. All is well!`;
+    const message = `Update: ${user.fullname} has safely finished their SafeRun at ${session.actualEndTime.toLocaleTimeString()}. All is well!`;
 
     try {
-        const result = await sendSMS(emergencyNumber, message);
+        const result = await sendSMS(user.emergencyContact.phoneNumber, message);
         console.log("SMS sent successfully.");
         return result;
 
@@ -50,12 +50,12 @@ async function sendSessionEndNotifications(user, session) {
 }
 
 
-// Send notification when extending session - will need to get the user name from the users once it's done
+// Send notification when extending session 
 async function sendSessionExtensionNotifications(user, session) {
-    const message = `Update: Elena has extended the session by 15 minutes. They should finish their SafeRun at ${session.scheduledEndTime.toLocaleTimeString()}.`;
+    const message = `Update: ${user.fullname} has extended the session by 15 minutes. They should finish their SafeRun at ${session.scheduledEndTime.toLocaleTimeString()}.`;
 
     try {
-        const result = await sendSMS(emergencyNumber, message);
+        const result = await sendSMS(user.emergencyContact.phoneNumber, message);
         console.log("SMS sent successfully.");
         return result;
 
@@ -64,18 +64,31 @@ async function sendSessionExtensionNotifications(user, session) {
     }
 }
 
-// Send notification when session is overdue - will need to get the user name from the users once it's done
+// Send notification when session is overdue (user hasn't checked in at the expected time) 
 async function sendSessionOverdueNotifications(user, session) {
-    const message = `Alert: Elena has not confirmed they are safe after their running session! Session was scheduled to end at ${session.scheduledEndTime.toLocaleTimeString()}. Please contact them immediately.`;
+    const message = `Alert: ${user.fullname} has not confirmed they are safe after their running session! Session was scheduled to end at ${session.scheduledEndTime.toLocaleTimeString()}. Please contact them immediately.`;
 
     try {
-        const result = await sendSMS(emergencyNumber, message);
+        const result = await sendSMS(user.emergencyContact.phoneNumber, message);
         console.log("SMS sent successfully.");
         return result;
 
     } catch (error) {
         console.error(`Failed to send SMS. Error: ${error.message}`);
     }
+}
+
+
+// Send notification when user presses panic button in the active page
+async function sendPanicButtonNotificationsActivePage(user) {
+  const message = `Alert: ${user.fullname} pressed the panic button during the SafeRun. Please check in with them immediately.`;
+  try {
+    const result = await sendSMS(user.emergencyContact.phoneNumber, message);
+    console.log('SMS sent successfully');
+    return result;
+  } catch(error) {
+    console.error(`Failed to send SMS. Error: ${error.message}`)
+  }
 }
 
 module.exports = { 
@@ -83,5 +96,6 @@ module.exports = {
     sendSessionStartNotifications, 
     sendSessionEndNotifications,
     sendSessionExtensionNotifications, 
-    sendSessionOverdueNotifications
+    sendSessionOverdueNotifications, 
+    sendPanicButtonNotificationsActivePage
 };
