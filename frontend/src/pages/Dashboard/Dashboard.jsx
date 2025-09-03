@@ -1,38 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createSafetySession } from "../../services/safetySession";
 import logo from "../../assets/logo-light-grey.png";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import Quote from '../../components/Quote';
+import Quote from "../../components/Quote";
 
 export function Dashboard() {
-  const [selectedDuration, setSelectedDuration] = useState(null); // Using state to manage selected duration
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+    const [selectedDuration, setSelectedDuration] = useState(null); // Using state to manage selected duration
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const userId = localStorage.getItem("userId");
-        const response = await fetch(`http://localhost:3000/users/${userId}`);
-        const data = await response.json();
-        setUser(data);
-        console.log("Fetched user from backend:", data);
-
-      } catch (error) {
-        console.error("Failed to load user:", error);
-      } finally {
-        setLoading(false);
-      }
+        try {
+            const userId = localStorage.getItem("userId");
+            const response = await fetch(`http://localhost:3000/users/${userId}`);
+            const data = await response.json();
+            setUser(data);
+            console.log("Fetched user from backend:", data);
+            } catch (error) {
+            console.error("Failed to load user:", error);
+            } finally {
+            setLoading(false);
+        }
     };
 
     fetchUser();
-  }, []);
+    }, []);
 
-  function durationToMinutes(duration) {
+    function durationToMinutes(duration) {
     // Convert duration string to minutes
     if (!duration) return null;
 
@@ -42,14 +41,14 @@ export function Dashboard() {
       return isNaN(hours) ? null : hours * 60; // checks whether the value is a number - if it is, multiply by 60 to convert to minutes, in NaN, return null
     } else if (duration.includes("minute")) {
       //checks if duration is in minutes ... same as above
-      const minutes = parseInt(duration);
-      return isNaN(minutes) ? null : minutes;
+        const minutes = parseInt(duration);
+        return isNaN(minutes) ? null : minutes;
     }
     return null;
-  }
+    }
 
-  const handleStartRun = async () => {
-    const numericDuration = durationToMinutes(selectedDuration);
+    const handleStartRun = async () => {
+        const numericDuration = durationToMinutes(selectedDuration);
 
     if (!selectedDuration) {
       alert("Please select a duration before starting the run.");
@@ -132,18 +131,17 @@ export function Dashboard() {
         </button>
 
         <div className="divider"></div>
-        
-          <Quote />
+
+        <Quote />
 
         <div className="divider"></div>
-
 
         {loading ? (
           <p>Loading user info...</p>
         ) : user?.emergencyContact ? (
           <>
             <h2 className="font-bold">Emergency Contact:</h2>
-           
+
             <div className="bg-primary bg-opacity-10 border border-primary p-4 rounded-lg shadow-md">
               <p>
                 <strong>Name:</strong> {user.emergencyContact.name}
