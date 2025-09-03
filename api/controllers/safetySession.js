@@ -1,7 +1,6 @@
 const SafetySession = require("../models/safetySession");
 const User = require("../models/user");
 const {sendSessionStartNotifications, sendSessionEndNotifications, sendSessionExtensionNotifications, sendSessionOverdueNotifications, sendPanicButtonNotificationsActivePage } = require("../lib/twilio");
-const EmergencyContact = require("../models/emergencyContact");
 
 async function getSafetySession(req, res) {
   try {
@@ -41,9 +40,8 @@ async function createSafetySession(req, res) {
     const savedSession = await safetySession.save();
     console.log("Safety session created, id:", savedSession._id.toString());
 
-    let user;
     try {
-      user = await User.findById(userId);
+      const user = await User.findById(userId);
 
       const smsResult = await sendSessionStartNotifications(user, savedSession);
 
@@ -72,7 +70,6 @@ async function createSafetySession(req, res) {
 async function checkIn(req, res) {
   try {
     const sessionId = req.params.id;
-    const { userId } = req.body;
 
     const session = await SafetySession.findByIdAndUpdate(
       sessionId,
@@ -83,10 +80,8 @@ async function checkIn(req, res) {
     if (!session) {
       return res.status(404).json({ message: "Safety session not found" });
     }
-
-    let user;
     try {
-      user = await User.findById(userId);
+      const user = await User.findById(session.userId);
       const smsResult = await sendSessionEndNotifications(user, session)
 
       res.status(200).json({
@@ -112,7 +107,6 @@ async function extendSession(req, res) {
   try {
     const sessionId = req.params.id;
     const { additionalMinutes = 15 } = req.body;
-    const { userId } = req.body;
 
     const session = await SafetySession.findById(sessionId);
 
@@ -130,9 +124,8 @@ async function extendSession(req, res) {
       { scheduledEndTime: newEndTime },
       { new: true }
     );
-    let user;
     try {
-      user = await User.findById(userId);
+      const user = await User.findById(session.userId);
       const smsResult = await sendSessionExtensionNotifications(user, session)
       res.status(200).json({
         message: `Session extended by ${additionalMinutes} minutes`,
@@ -182,16 +175,14 @@ async function overDueSession() {
 async function panicButtonActivePage(req, res) {
   try {
     const sessionId = req.params.id;
-    const {userId} = req.body;
 
     const session = await SafetySession.findById(sessionId)
 
     if (!session) {
       return res.status(404).json({ message: "Safety session not found" });
     }
-  let user;
     try {
-      user = await User.findById(userId);
+      const user = await User.findById(session.userId);
       const smsResult = await sendPanicButtonNotificationsActivePage(user, session)
       await SafetySession.findByIdAndUpdate(sessionId, {panicButtonPressed: true})
       res.status(200).json({
