@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createSafetySession } from "../../services/safetySession";
 import logo from "../../assets/logo-light-grey.png";
 import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
 import Quote from '../../components/Quote';
 
 export function Dashboard() {
@@ -161,7 +160,6 @@ export function Dashboard() {
           <p>No emergency contact info available.</p>
         )}
       </main>
-      <Footer />
     </>
   );
 }
