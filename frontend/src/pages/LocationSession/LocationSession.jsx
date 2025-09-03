@@ -433,7 +433,7 @@ export default function LocationSession() {
             
             {/* Check-in Modal */}
             {showCheckInModal && (
-                <div className="modal modal-open">
+                <div className="modal modal-open safety-check-modal">
                     <div className="modal-box">
                         <h3 className="font-bold text-lg mb-4">🚨 Safety Check Time!</h3>
                         <p className="mb-4">

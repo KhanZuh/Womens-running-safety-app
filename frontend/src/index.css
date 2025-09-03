@@ -32,7 +32,8 @@ h1 {
   line-height: 1.1;
 }
 
-/* Hide the leaflet/Geoapify attribution in modals - messes witht the modal apperance */
-.modal .leaflet-control-attribution {
-    display: none !important;
+/* For interferring attribution on location saftey session check in modal */
+/* Just moves this modal pop up a few pixels higher - as legally we need to show the attribution */
+.safety-check-modal .modal-box {
+    transform: translateY(-100px) !important;
 }
