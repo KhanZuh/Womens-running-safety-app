@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3000"; // or use an environment variable later
+const BASE_URL = import.meta.env.VITE_BACKEND_URL; // or use an environment variable later
 
 export async function getEmergencyContact(userId) {
   const response = await fetch(`${BASE_URL}/emergency-contacts/${userId}`);
