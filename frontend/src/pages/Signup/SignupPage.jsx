@@ -88,15 +88,15 @@ export function SignupPage() {
 
   return (
     <>
-      <img src={logo} alt="SafeRun logo" className="w-72 mx-auto" />
-      <h2 className="text-3xl font-bold mb-6 text-center">Sign Up</h2>
+      <img src={logo} alt="SafeRun logo" className="w-72 mt-8 mx-auto" />
+      <h2 className="text-3xl font-bold mb-6 mt-8 text-white text-center">Sign Up</h2>
 
       {error && (
         <div className="text-red-500 text-center font-semibold mb-4">
           {error}
         </div>
       )}
-      <div className="max-w-md mx-auto p-8 bg-base-200 rounded-lg shadow-lg">
+      <div className="max-w-md mx-auto p-8 text-white bg-base-200 rounded-lg shadow-lg">
         <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
           <label className="flex flex-col">
             Full Name:
@@ -226,7 +226,7 @@ export function SignupPage() {
 
           <button
             type="submit"
-            className="btn btn-accent btn-wide font-bold border-4"
+            className="btn btn-accent self-center btn-wide font-bold border-4"
           >
             Submit
           </button>
