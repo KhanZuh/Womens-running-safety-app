@@ -123,7 +123,7 @@ export function Dashboard() {
         }
     };
     
-  const durations = ["1 minutes", "1 hour", "2 hours"];
+  const durations = ["2 minutes", "1 hour", "2 hours"];
 
   return (
     <>
