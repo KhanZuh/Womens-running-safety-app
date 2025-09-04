@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createSafetySession } from "../../services/safetySession";
 import { createLocationSafetySession } from "../../services/locationSafetySession";
 import logo from "../../assets/logo-light-grey.png";
+import Tagline from "../../assets/Tagline-2.svg";
 import Navbar from "../../components/Navbar";
 import Quote from '../../components/Quote';
 import LocationPicker from "../../components/LocationPicker";
