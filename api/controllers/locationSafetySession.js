@@ -1,4 +1,6 @@
 const LocationSafetySession = require("../models/locationSafetySession");
+const User = require("../models/user");
+const {sendSessionStartNotifications, sendSessionEndNotifications, sendPanicButtonNotificationsActivePage} = require("../lib/twilio")
 
 // Helper function to calculate distance between two points
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -82,10 +84,27 @@ const LocationSafetySessionController = {
         locationSafetySession._id
       );
 
-      res.status(201).json({
-        message: "Location safety session created successfully",
-        safetySession: locationSafetySession,
-      });
+      try {
+        const user = await User.findById(userId);
+        const sessionForNotification = {
+          duration: estimatedDuration
+        }
+        const smsResult = await sendSessionStartNotifications(user, sessionForNotification)
+        res.status(201).json({
+          message: "Location safety session created successfully",
+          sessionId: locationSafetySession._id,
+          safetySession: locationSafetySession,
+          smsSent: smsResult,
+        });
+      } catch (smsError) {
+        console.error("SMS notification error", smsError)
+         res.status(201).json({
+          message: "Location safety session created successfully, but notification failed",
+          sessionId: locationSafetySession._id,
+          safetySession: locationSafetySession,
+          notificationError: "SMS notification failed",
+        });
+      }
     } catch (error) {
       console.error("Error creating location safety session:", error);
       res.status(500).json({ message: "Server error", error: error.message });
@@ -233,14 +252,31 @@ const LocationSafetySessionController = {
       session.status = "completed";
       session.endTime = new Date();
 
-      await session.save();
+      try {
+        const user = await User.findById(session.userId);
+        const sessionForNotification = {
+          actualEndTime: session.endTime,
+        };
+        const smsResult = await sendSessionEndNotifications(user, sessionForNotification);
+        await session.save();
+        console.log(`Location safety session ${id} ended manually`);
+  
+        res.status(200).json({
+          message: "Location safety session ended successfully",
+          safetySession: session,
+          smsSent: smsResult,
+        });
+      } catch (smsError) {
+        console.error("SMS notification error: ", smsError);
+        await session.save();
+        res.status(200).json({
+          message: "Location safety session ended successfully, but notification failed",
+          safetySession: session,
+          notificationError: "SMS notification failed",
+        })
+      }
 
-      console.log(`Location safety session ${id} ended manually`);
 
-      res.status(200).json({
-        message: "Location safety session ended successfully",
-        safetySession: session,
-      });
     } catch (error) {
       console.error("Error ending location safety session:", error);
       res.status(500).json({ message: "Server error", error: error.message });
