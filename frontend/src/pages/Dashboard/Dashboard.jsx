@@ -4,120 +4,124 @@ import { createSafetySession } from "../../services/safetySession";
 import { createLocationSafetySession } from "../../services/locationSafetySession";
 import logo from "../../assets/logo-light-grey.png";
 import Navbar from "../../components/Navbar";
-import Quote from "../../components/Quote";
+import Quote from '../../components/Quote';
 import LocationPicker from "../../components/LocationPicker";
-import Tagline from "../../assets/Tagline-2.svg";
 
 export function Dashboard() {
-  const [sessionType, setSessionType] = useState("timer");
-  const [startCoords, setStartCoords] = useState(null);
-  const [endCoords, setEndCoords] = useState(null);
-  const [mapCenter, setMapCenter] = useState([51.505, -0.09]); // Default to London
-  const [selectedDuration, setSelectedDuration] = useState(null);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  const navigate = useNavigate();
+    const [sessionType, setSessionType] = useState('timer'); 
+    const [startCoords, setStartCoords] = useState(null);
+    const [endCoords, setEndCoords] = useState(null);
+    const [mapCenter, setMapCenter] = useState([51.505, -0.09]); // Default to London
+    const [selectedDuration, setSelectedDuration] = useState(null);
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userId = localStorage.getItem("userId");
-        const response = await fetch(`http://localhost:3000/users/${userId}`);
-        const data = await response.json();
-        setUser(data);
-        console.log("Fetched user from backend:", data);
-      } catch (error) {
-        console.error("Failed to load user:", error);
-      } finally {
-        setLoading(false);
-      }
+    const navigate = useNavigate();
+
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const userId = localStorage.getItem("userId");
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}`);
+                const data = await response.json();
+                setUser(data);
+                console.log("Fetched user from backend:", data);
+            } catch (error) {
+                console.error("Failed to load user:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUser();
+    }, []);
+
+    function durationToMinutes(duration) {
+        // Convert duration string to minutes
+        if (!duration) return null;
+
+        if (duration.includes("hour")) {
+            // checks if duration is in hours
+            const hours = parseInt(duration); // extract the number
+            return isNaN(hours) ? null : hours * 60; // checks whether the value is a number - if it is, multiply by 60 to convert to minutes, in NaN, return null
+        } else if (duration.includes("minute")) {
+            //checks if duration is in minutes ... same as above
+            const minutes = parseInt(duration);
+            return isNaN(minutes) ? null : minutes;
+        }
+        return null;
+    }
+
+    const handleStartRun = async () => {
+        const numericDuration = durationToMinutes(selectedDuration);
+
+        if (!selectedDuration) {
+            alert("Please select a duration before starting the run.");
+            return;
+        }
+
+        try {
+
+            const userId = localStorage.getItem("userId");
+            console.log("Calling createSafetySession with:", {
+                userId,
+                duration: numericDuration,
+            });
+
+            const data = await createSafetySession({
+                userId,
+                duration: numericDuration,
+            });
+            console.log("Received response:", data);
+
+            // BUG FIX: Backend sending the session ID as _id inside a nested safetysession object - not as sessionId (this is a convention from MongoDB)
+            if (!data.safetySession._id) {
+                throw new Error("Invalid response - missing sessionId");
+            }
+
+            navigate(`/active/${data.safetySession._id}`);
+        } catch (err) {
+            console.error("Error details:", {
+                status: err.response?.status,
+                data: err.response?.data,
+                message: err.message,
+            });
+
+            alert(`Failed to start run: ${err.message}`);
+        }
     };
 
-    fetchUser();
-  }, []);
 
-  function durationToMinutes(duration) {
-    // Convert duration string to minutes
-    if (!duration) return null;
+    const handleStartLocationRun = async () => {
+        console.log('Starting location-based run:', { startCoords, endCoords });
 
-    if (duration.includes("hour")) {
-      // checks if duration is in hours
-      const hours = parseInt(duration); // extract the number
-      return isNaN(hours) ? null : hours * 60; // checks whether the value is a number - if it is, multiply by 60 to convert to minutes, in NaN, return null
-    } else if (duration.includes("minute")) {
-      //checks if duration is in minutes ... same as above
-      const minutes = parseInt(duration);
-      return isNaN(minutes) ? null : minutes;
-    }
-    return null;
-  }
+        if (!startCoords || !endCoords) {
+            alert("Please select both start and end points on the map.");
+            return;
+        }
 
-  const handleStartRun = async () => {
-    const numericDuration = durationToMinutes(selectedDuration);
-
-    if (!selectedDuration) {
-      alert("Please select a duration before starting the run.");
-      return;
-    }
-
-    try {
-      const userId = localStorage.getItem("userId");
-      console.log("Calling createSafetySession with:", {
-        userId,
-        duration: numericDuration,
-      });
-
-      const data = await createSafetySession({
-        userId,
-        duration: numericDuration,
-      });
-      console.log("Received response:", data);
-
-      // BUG FIX: Backend sending the session ID as _id inside a nested safetysession object - not as sessionId (this is a convention from MongoDB)
-      if (!data.safetySession._id) {
-        throw new Error("Invalid response - missing sessionId");
-      }
-
-      navigate(`/active/${data.safetySession._id}`);
-    } catch (err) {
-      console.error("Error details:", {
-        status: err.response?.status,
-        data: err.response?.data,
-        message: err.message,
-      });
-
-      alert(`Failed to start run: ${err.message}`);
-    }
-  };
-
-  const handleStartLocationRun = async () => {
-    console.log("Starting location-based run:", { startCoords, endCoords });
-
-    if (!startCoords || !endCoords) {
-      alert("Please select both start and end points on the map.");
-      return;
-    }
-
-    try {
-      const userId = localStorage.getItem("userId");
-
-      const data = await createLocationSafetySession({
-        userId,
-        startCoords,
-        endCoords,
-      });
-
-      console.log("Location session created:", data);
-
-      // Navigate to location session (not regular active session)
-      navigate(`/location-session/${data.safetySession._id}`);
-    } catch (err) {
-      console.error("Error starting location run:", err);
-      alert(`Failed to start location run: ${err.message}`);
-    }
-  };
-
+        try {
+            const userId = localStorage.getItem("userId");
+            
+            const data = await createLocationSafetySession({ 
+                userId, 
+                startCoords,
+                endCoords
+            });
+            
+            console.log('Location session created:', data);
+            
+            // Navigate to location session (not regular active session)
+            navigate(`/location-session/${data.safetySession._id}`);
+            
+        } catch (err) {
+            console.error('Error starting location run:', err);
+            alert(`Failed to start location run: ${err.message}`);
+        }
+    };
+    
   const durations = ["1 minutes", "1 hour", "2 hours"];
 
   return (

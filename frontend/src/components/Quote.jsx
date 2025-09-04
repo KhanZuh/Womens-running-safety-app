@@ -5,7 +5,7 @@ const Quote = () => {
     const [quote, setQuote] = useState(null);
 
     useEffect(() => {
-        fetch("http://localhost:3000/quotes")
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/quotes`)
         .then(response => response.json())
         .then(data => {
             console.log("Fetched quote:", data);
