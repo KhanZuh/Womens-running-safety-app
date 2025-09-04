@@ -24,7 +24,7 @@ export function Dashboard() {
         const fetchUser = async () => {
             try {
                 const userId = localStorage.getItem("userId");
-                const response = await fetch(`http://localhost:3000/users/${userId}`);
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}`);
                 const data = await response.json();
                 setUser(data);
                 console.log("Fetched user from backend:", data);
