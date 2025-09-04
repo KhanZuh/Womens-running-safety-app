@@ -229,15 +229,17 @@ export default function LocationPicker({
             )}
 
             {/* Instructions */}
-            <div className="mt-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
-                <div className="font-semibold mb-2">How it works:</div>
-                <ul className="list-disc list-inside space-y-1">
-                    <li>🟢 Start point is automatically set to your current location</li>
-                    <li>🔴 Click anywhere on the map to set your destination</li>
-                    <li>📱 Make sure location services are enabled</li>
-                    <li>🏃‍♀️ You'll be tracked in real-time during your run</li>
-                </ul>
-            </div>
+            <div className="mt-4 p-4 bg-gray-800/80 rounded-lg text-sm text-gray-200 border border-gray-700">
+    <div className="font-semibold mb-2 text-white">How it works:</div>
+    <ul className="list-disc list-inside space-y-1">
+        <li>🟢 Start point is automatically set to your current location</li>
+        <li>🔴 Click anywhere on the map to set your destination</li>
+        <li>📱 Make sure location services are enabled</li>
+        <li>🏃‍♀️ You'll be tracked in real-time during your run</li>
+    </ul>
+</div>
+
         </div>
     );
 }
+

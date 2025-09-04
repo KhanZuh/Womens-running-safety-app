@@ -16,7 +16,7 @@ const Quote = () => {
 
 
     return (
-        <div>
+        <div className="mx-12">
             {quote ? (
             <>
                 <p className="italic">&quot;{quote.quote}&quot;</p>

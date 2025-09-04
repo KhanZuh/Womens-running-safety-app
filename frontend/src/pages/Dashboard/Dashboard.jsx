@@ -121,115 +121,152 @@ export function Dashboard() {
             alert(`Failed to start location run: ${err.message}`);
         }
     };
+    
+  const durations = ["1 minutes", "1 hour", "2 hours"];
 
+  return (
+    <>
+      <Navbar />
+      <main className="flex flex-col justify-center items-center min-h-screen w-full text-center space-y-6 pt-20 pb-20">
+        <img src={logo} alt="SafeRun logo" className="w-72 mx-auto" />
+        <img src={Tagline} alt="tagline" className="w-72 mx-auto" />
 
-    const durations = ["30 minutes", "1 hour", "2 hours"];
+        {/* Conditional rendering based on session type instead of always showing timer description */}
+        {sessionType === "timer" && (
+          <p >Enter your estimated run and we'll handle the rest.</p>
+        )}
 
-    return (
-        <>
-            <Navbar />
-            <main className="flex flex-col justify-center items-center min-h-screen w-full text-center space-y-6">
-                <img src={logo} alt="SafeRun logo" className="w-72 mx-auto" />
+        {/* Session Type Toggle */}
+        <div className="flex gap-4 mb-6">
+          <button
+            onClick={() => setSessionType("timer")}
+            className={`btn btn-sm ${sessionType === "timer" ? "btn-accent" : "btn-outline btn-accent"}`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              />
+            </svg>
+            Timer Based
+          </button>
+          <button
+            onClick={() => setSessionType("location")}
+            className={`btn btn-sm ${sessionType === "location" ? "btn-accent" : "btn-outline btn-accent"}`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+              />
+            </svg>
+            Location Based
+          </button>
+        </div>
 
-                <h2 className="font-bold">
-                    Let someone know you're running - just in case.
-                </h2>
-                {/* Conditional rendering based on session type instead of always showing timer description */}
-                {sessionType === 'timer' && <p>Enter your estimated run and we'll handle the rest.</p>}
+        <div className="divider mx-8"></div>
 
-                {/* Session Type Toggle */}
-                <div className="flex gap-4 mb-6">
-                    <button
-                        onClick={() => setSessionType('timer')}
-                        className={`btn btn-sm ${sessionType === 'timer' ? 'btn-accent' : 'btn-outline btn-accent'}`}
-                    >
-                        ⏱️ Timer Based
-                    </button>
-                    <button
-                        onClick={() => setSessionType('location')}
-                        className={`btn btn-sm ${sessionType === 'location' ? 'btn-accent' : 'btn-outline btn-accent'}`}
-                    >
-                        📍 Location Based
-                    </button>
-                </div>
+        {/* Conditional rendering based on session type */}
+        {sessionType === "timer" ? (
+          <>
+            <p className="text-white font-bold ">How long will you run?</p>
+            <div className="flex flex-wrap justify-center gap-4">
+              {durations.map((duration) => {
+                const isSelected = selectedDuration === duration;
+                return (
+                  <button
+                    key={duration}
+                    onClick={() => {
+                      console.log(`Duration selected: ${duration}`);
+                      setSelectedDuration(duration);
+                    }}
+                    className={`btn btn-sm ${isSelected ? "btn-accent" : "btn-outline btn-accent"}`}
+                  >
+                    {duration}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          // Location-based UI
+          <>
+            <p className="text-white">
+              Your current location will be the start point. Select your
+              destination on the map.
+            </p>
+            <LocationPicker
+              startCoords={startCoords}
+              endCoords={endCoords}
+              onStartChange={setStartCoords}
+              onEndChange={setEndCoords}
+              mapCenter={mapCenter}
+              setMapCenter={setMapCenter}
+            />
+          </>
+        )}
 
-                <div className="divider"></div>
+        {/* Dynamic Start Run button that handles both session types */}
+        <button
+          onClick={
+            sessionType === "timer" ? handleStartRun : handleStartLocationRun
+          }
+          className="btn btn-accent btn-sm btn-wide font-bold border-4"
+          disabled={sessionType === "location" && (!startCoords || !endCoords)}
+        >
+          Start Run
+        </button>
 
-                {/* Conditional rendering based on session type */}
-                {sessionType === 'timer' ? (
-                    <>
-                        <p>How long will you run?</p>
-                        <div className="flex flex-wrap justify-center gap-4">
-                            {durations.map((duration) => {
-                                const isSelected = selectedDuration === duration;
-                                return (
-                                    <button
-                                        key={duration}
-                                        onClick={() => {
-                                            console.log(`Duration selected: ${duration}`);
-                                            setSelectedDuration(duration);
-                                        }}
-                                        className={`btn btn-sm ${isSelected ? "btn-accent" : "btn-outline btn-accent"}`}
-                                    >
-                                        {duration}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </>
-                ) : (
-                    // Location-based UI
-                    <>
-                        <p>Your current location will be the start point. Select your destination on the map.</p>
-                        <LocationPicker 
-                            startCoords={startCoords}
-                            endCoords={endCoords}
-                            onStartChange={setStartCoords}
-                            onEndChange={setEndCoords}
-                            mapCenter={mapCenter}
-                            setMapCenter={setMapCenter}
-                        />
-                    </>
-                )}
+        <div className="divider mx-8"></div>
 
-                {/* Dynamic Start Run button that handles both session types */}
-                <button
-                    onClick={sessionType === 'timer' ? handleStartRun : handleStartLocationRun}
-                    className="btn btn-accent btn-sm btn-wide font-bold border-4"
-                    disabled={sessionType === 'location' && (!startCoords || !endCoords)}
-                >
-                    Start Run
-                </button>
+        <Quote />
 
-                    <div className="divider"></div>
+        <div className="divider mx-8"></div>
 
-                    <Quote />
-
-                    <div className="divider"></div>
-
-                {/* Emergecy contact display*/}
-                {loading ? (
-                    <p>Loading user info...</p>
-                ) : user?.emergencyContact ? (
-                    <>
-                        <h2 className="font-bold">Emergency Contact:</h2>
-                        <div className="bg-primary bg-opacity-10 border border-primary p-4 rounded-lg shadow-md">
-                            <p>
-                                <strong>Name:</strong> {user.emergencyContact.name}
-                            </p>
-                            <p>
-                                <strong>Phone:</strong> {user.emergencyContact.phoneNumber}
-                            </p>
-                            <p>
-                                <strong>Relationship:</strong>{" "}
-                                {user.emergencyContact.relationship}
-                            </p>
-                        </div>
-                    </>
-                ) : (
-                    <p>No emergency contact info available.</p>
-                )}
-            </main>
-        </>
-    );
+        {/* Emergecy contact display*/}
+        {loading ? (
+          <p>Loading user info...</p>
+        ) : user?.emergencyContact ? (
+          <>
+            <h2 className="font-bold text-white">Emergency Contact:</h2>
+            <div className="bg-primary bg-opacity-10 border border-primary p-4 rounded-lg shadow-md">
+              <p className="text-white">
+                <strong>Name:</strong> {user.emergencyContact.name}
+              </p>
+              <p className="text-white">
+                <strong>Phone:</strong> {user.emergencyContact.phoneNumber}
+              </p>
+              <p className="text-white">
+                <strong>Relationship:</strong>{" "}
+                {user.emergencyContact.relationship}
+              </p>
+            </div>
+          </>
+        ) : (
+          <p className="text-white">No emergency contact info available.</p>
+        )}
+      </main>
+    </>
+  );
 }
