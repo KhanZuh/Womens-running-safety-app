@@ -339,17 +339,17 @@ export default function LocationSession() {
       <div className="min-h-screen bg-base-100 flex flex-col items-center p-4">
         {/* Header */}
         <div className="text-center mb-4">
-          <h1 className="text-2xl font-bold mb-2 text-white">
-            🏃‍♀️ You're on a location-based run!
+          <h1 className="text-2xl font-bold mt-8 mb-4 text-white">
+            You're on a location-based run!
           </h1>
-          <p className="text-sm text-white">Stay safe</p>
+          <p className="text-sm mb-4 text-white">We'll check in after a period of no movement</p>
         </div>
 
         {/* Status Info */}
-        <div className="w-full max-w-4xl mb-4">
+        <div className="w-full max-w-4xl text-white mb-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
             <div className="stat bg-base-200 rounded-lg p-4">
-              <div className="stat-title">Distance to Destination</div>
+              <div className="stat-title text-white">Distance to Destination</div>
               <div className="stat-value text-2xl">
                 {distanceToDestination !== null
                   ? `${(distanceToDestination * 1000).toFixed(0)}m`
@@ -358,14 +358,14 @@ export default function LocationSession() {
             </div>
 
             <div className="stat bg-base-200 rounded-lg p-4">
-              <div className="stat-title">Check-ins Completed</div>
+              <div className="stat-title text-white">Check-ins Completed</div>
               <div className="stat-value text-2xl">
                 {session?.checkInCount || 0}
               </div>
             </div>
 
             <div className="stat bg-base-200 rounded-lg p-4">
-              <div className="stat-title">Next Check-in</div>
+              <div className="stat-title text-white">Next Check-in</div>
               <div className="stat-value text-lg">
                 {timeUntilCheckIn
                   ? formatTimeRemaining(timeUntilCheckIn)
@@ -451,10 +451,10 @@ export default function LocationSession() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-4">
           <button
             onClick={handleSafeCheckIn}
-            className="btn btn-accent btn-sm btn-wide font-bold border-4 self-center"
+            className="btn btn-accent font-bold border-4 self-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -499,16 +499,16 @@ export default function LocationSession() {
       {/* Check-in Modal */}
       {showCheckInModal && (
         <div className="modal modal-open safety-check-modal">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4"> Safety Check Time!</h3>
-            <p className="mb-4">
+          <div className="modal-box border-4 border-accent">
+            <h3 className="font-bold text-white text-2xl mb-4"> Safety Check Time!</h3>
+            <p className="mb-4 text-white">
               It's been {session?.checkInCount === 0 ? "1 hour" : "45 minutes"}{" "}
               since your last check-in.
             </p>
-            <p className="mb-6">Are you safe and continuing your run?</p>
+            <p className="mb-6 text-white">Are you safe and continuing your run?</p>
 
-            <div className="modal-action">
-              <button onClick={handleSafeCheckIn} className="btn btn-accent btn-sm btn-wide font-bold border-4 self-center">
+            <div className="modal-action flex flex-col">
+              <button onClick={handleSafeCheckIn} className="btn btn-accent mb-4 font-bold border-4 self-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

@@ -246,7 +246,7 @@ export const ActiveSession = () => {
           {!isPanicActivated && (
             <button
               onClick={handleExtendTime}
-              className="btn btn-outline btn-secondary"
+              className="btn btn-outline btn-primary"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
