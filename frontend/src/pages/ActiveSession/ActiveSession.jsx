@@ -193,7 +193,7 @@ export const ActiveSession = () => {
           <h1 className="text-2xl text-white font-bold mb-2">
             {isPanicActivated
               ? "We've contacted your emergency contact"
-              : "🏃‍♀️ You're on a run!"}
+              : "You're on a run!"}
           </h1>
           <p className="text-base-content/70 text-white">
             {isPanicActivated
@@ -225,7 +225,7 @@ export const ActiveSession = () => {
           {!isPanicActivated && <div className="divider"></div>}
           <button
             onClick={handleEndSession}
-            className="btn btn-accent btn-sm btn-wide font-bold border-4 self-center"
+            className="btn btn-accent font-bold  border-4"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -1,4 +1,4 @@
-import logo from '../assets/logo-light-grey.png';
+import logo from '../assets/logo-light-grey-just-shoe.png';
 import useLogout from "../hooks/useLogout";
 import { PanicButtonActivePage } from "./PanicButtonActive";
 
@@ -15,7 +15,7 @@ const Navbar = ({ showPanicButton = false, sessionId, onPanicActivated }) => {
                     <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
                         <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
+                        className="h-8 w-8"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -43,7 +43,7 @@ const Navbar = ({ showPanicButton = false, sessionId, onPanicActivated }) => {
                     </div>
                 </div>
                 <div className="navbar-center">
-                    <img src={logo} alt="SafeRun logo" className="w-20" />
+                    <img src={logo} alt="SafeRun logo" className="w-14" />
                 </div>
                 <div className="navbar-end">
                     {showPanicButton && sessionId && (

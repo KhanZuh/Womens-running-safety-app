@@ -6,7 +6,7 @@ import logo from "../../assets/logo-light-grey.png";
 import Navbar from "../../components/Navbar";
 import Quote from "../../components/Quote";
 import LocationPicker from "../../components/LocationPicker";
-import Tagline from "../../assets/Tagline-2.png";
+import Tagline from "../../assets/Tagline-2.svg";
 
 export function Dashboard() {
   const [sessionType, setSessionType] = useState("timer");
@@ -123,13 +123,13 @@ export function Dashboard() {
   return (
     <>
       <Navbar />
-      <main className="flex flex-col justify-center items-center min-h-screen w-full text-center space-y-6">
+      <main className="flex flex-col justify-center items-center min-h-screen w-full text-center space-y-6 pt-20 pb-20">
         <img src={logo} alt="SafeRun logo" className="w-72 mx-auto" />
         <img src={Tagline} alt="tagline" className="w-72 mx-auto" />
 
         {/* Conditional rendering based on session type instead of always showing timer description */}
         {sessionType === "timer" && (
-          <p>Enter your estimated run and we'll handle the rest.</p>
+          <p >Enter your estimated run and we'll handle the rest.</p>
         )}
 
         {/* Session Type Toggle */}
@@ -181,12 +181,12 @@ export function Dashboard() {
           </button>
         </div>
 
-        <div className="divider"></div>
+        <div className="divider mx-8"></div>
 
         {/* Conditional rendering based on session type */}
         {sessionType === "timer" ? (
           <>
-            <p>How long will you run?</p>
+            <p className="text-white font-bold ">How long will you run?</p>
             <div className="flex flex-wrap justify-center gap-4">
               {durations.map((duration) => {
                 const isSelected = selectedDuration === duration;
@@ -234,11 +234,11 @@ export function Dashboard() {
           Start Run
         </button>
 
-        <div className="divider"></div>
+        <div className="divider mx-8"></div>
 
         <Quote />
 
-        <div className="divider"></div>
+        <div className="divider mx-8"></div>
 
         {/* Emergecy contact display*/}
         {loading ? (
